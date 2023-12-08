@@ -587,7 +587,7 @@
         enable = true;
         hook = [
           ''
-            (rust-mode . (lambda ()
+            (rustic . (lambda ()
                            (direnv-update-environment)
                            (lsp)))
           ''
@@ -601,6 +601,10 @@
       lsp-treemacs = {
         enable = true;
         after = ["lsp-mode" "treemacs"];
+        config = ''
+          (setq treemacs-python-executable
+              "${pkgs.python3}/bin/python3")
+        '';
       };
 
       dap-mode = {
@@ -1197,9 +1201,15 @@
         '';
       };
 
-      rust-mode = {
+      rustic = {
         enable = true;
-        mode = [''"\\.rs\\'"''];
+        config = ''
+          (setq rustic-analyzer-command
+                '("${pkgs.rust-analyzer}/bin/rust-analyzer"))
+          (setq rustic-cargo-bin
+                 "${pkgs.cargo}/bin/cargo")
+          (setq rustic-format-on-save t)
+        '';
       };
 
       sendmail = {

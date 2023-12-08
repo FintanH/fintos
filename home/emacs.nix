@@ -30,7 +30,7 @@
       ;; Set up fonts early.
       (set-face-attribute 'default
                           nil
-                          :height 80
+                          :height 120
                           :family "Fantasque Sans Mono")
       (set-face-attribute 'variable-pitch
                           nil

@@ -18,9 +18,15 @@
     enable = true;
     defaultEditor = true;
   };
-  
+
+  # Configure fonts
+  fonts.fontconfig.enable = true;
+
   # User profile packages
   home.packages = with pkgs; [
+    # Fonts
+    (nerdfonts.override {fonts = ["FiraCode" "DroidSansMono" "DejaVuSansMono" "FantasqueSansMono"];})
+
     # archives
     unzip
     zip

@@ -64,6 +64,12 @@
     inputs.radicle.packages.x86_64-linux.radicle-node
   ];
 
+  # Allow direnv to execute when cd'ing
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   # alacritty - a cross-platform, GPU-accelerated terminal emulator
   programs.alacritty = {
     enable = true;

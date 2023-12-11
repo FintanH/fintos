@@ -12,7 +12,8 @@
       path = "${config.xdg.dataHome}/zsh/history";
     };
     initExtra = ''
-      autoload -U colors && colors
+      autoload -U colors && colors;
+      eval "$(direnv hook zsh)";
     '';
     sessionVariables = {
       EDITOR = "${pkgs.emacs}/bin/emacs";

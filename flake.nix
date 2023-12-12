@@ -19,6 +19,14 @@
   } @ inputs: let
     pkgs = import nixpkgs {system = "x86_64-linux";};
     nurNoPkgs = import nur {nurpkgs = pkgs;};
+    registryModule = [
+      {
+        nix.registry.nixpkgs.flake = inputs.nixpkgs;
+        # register this flake in the registry so we can refer to it as
+        # #fintos
+        nix.registry.fintos.flake = inputs.self;
+      }
+    ];
   in {
     # Formatter
     formatter.x86_64-linux = pkgs.alejandra;
@@ -35,26 +43,28 @@
     ];
 
     nixosConfigurations = {
-      # To deploy this NixOS system:
-      #   sudo nixos-rebuild switch --flake .#nixos-test
-      "nixos-test" = nixpkgs.lib.nixosSystem {
-        modules = [
-          ./configuration.nix
-          ./home/gnome.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.fintohaps = ./home.nix;
+      # To deploy this NixOS system (from any directory):
+      #   sudo nixos-rebuild switch --flake fintos#fintos
+      "fintos" = nixpkgs.lib.nixosSystem {
+        modules =
+          [
+            ./configuration.nix
+            ./home/gnome.nix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.fintohaps = ./home.nix;
 
-            # Optionally, use home-manager.extraSpecialArgs to pass
-            # arguments to home.nix
-            home-manager.extraSpecialArgs = {
-              inherit nurNoPkgs;
-              inherit inputs;
-            };
-          }
-        ];
+              # Optionally, use home-manager.extraSpecialArgs to pass
+              # arguments to home.nix
+              home-manager.extraSpecialArgs = {
+                inherit nurNoPkgs;
+                inherit inputs;
+              };
+            }
+          ]
+          ++ registryModule;
       };
     };
   };

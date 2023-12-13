@@ -23,7 +23,7 @@
       {
         nix.registry.nixpkgs.flake = inputs.nixpkgs;
         # register this flake in the registry so we can refer to it as
-        # #fintos
+        # fintos
         nix.registry.fintos.flake = inputs.self;
       }
     ];
@@ -44,8 +44,8 @@
 
     nixosConfigurations = {
       # To deploy this NixOS system (from any directory):
-      #   sudo nixos-rebuild switch --flake fintos#fintos
-      "fintos" = nixpkgs.lib.nixosSystem {
+      #   sudo nixos-rebuild switch --flake fintos
+      "haptop" = nixpkgs.lib.nixosSystem {
         modules =
           [
             ./configuration.nix

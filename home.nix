@@ -56,6 +56,7 @@
 
     # application
     element-desktop
+    obsidian
     zoom-us
 
     # radicle

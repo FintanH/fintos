@@ -14,6 +14,11 @@
     recommendedGcSettings = true;
 
     prelude = ''
+      ;; This function is defined in Emacs 29 but magit requires it
+      (defun seq-keep (function sequence)
+        "Apply FUNCTION to SEQUENCE and return the list of all the non-nil results."
+          (delq nil (seq-map function sequence)))
+
       ;; Disable startup message.
       (setq inhibit-startup-message t
             inhibit-startup-echo-area-message (user-login-name))
@@ -454,6 +459,13 @@
           (add-to-list 'git-commit-style-convention-checks
                        'overlong-summary-line)
         '';
+      };
+
+      magit-delta = {
+        enable = true;
+        hook = [
+          "(magit-mode . magit-delta-mode)"
+        ];
       };
 
       git-messenger = {

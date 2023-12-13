@@ -51,6 +51,7 @@
 
     # development
     asciidoctor
+    delta # git-delta
     direnv
     niv
 

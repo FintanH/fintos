@@ -583,10 +583,10 @@
         enable = true;
         command = ["lsp"];
         bind = {
-          "C-c r r" = "lsp-rename";
-          "C-c r f" = "lsp-format-buffer";
-          "C-c r g" = "lsp-format-region";
-          "C-c r a" = "lsp-execute-code-action";
+          "C-c l r" = "lsp-rename";
+          "C-c f b" = "lsp-format-buffer";
+          "C-c f g" = "lsp-format-region";
+          "C-c c a" = "lsp-execute-code-action";
           "C-c f r" = "lsp-find-references";
         };
         config = ''

@@ -156,18 +156,18 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1701958190,
-        "narHash": "sha256-TsjDTmLGg1gZ6IMOrAoyFoHhfKYvtxDbkw2BhohchqA=",
-        "owner": "radicle-dev",
-        "repo": "heartwood",
-        "rev": "4bb7816af4d7c35fface8a928e2bd9debfbda080",
-        "type": "github"
+        "lastModified": 1707134016,
+        "narHash": "sha256-Cu8fHlircqH6qY9fN7Q5EWFgOZN1751BTKAKUI0AVQo=",
+        "ref": "refs/heads/master",
+        "rev": "5abd7bf55a093341231c8b71953777068eade0e2",
+        "revCount": 1667,
+        "type": "git",
+        "url": "https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git"
       },
       "original": {
-        "owner": "radicle-dev",
-        "ref": "nix-flake",
-        "repo": "heartwood",
-        "type": "github"
+        "rev": "5abd7bf55a093341231c8b71953777068eade0e2",
+        "type": "git",
+        "url": "https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git"
       }
     },
     "root": {

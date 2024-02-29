@@ -64,6 +64,7 @@
     inputs.radicle.packages.x86_64-linux.radicle-remote-helper
     inputs.radicle.packages.x86_64-linux.radicle-cli
     inputs.radicle.packages.x86_64-linux.radicle-node
+    inputs.radicle.packages.x86_64-linux.radicle-httpd
   ];
 
   # Allow direnv to execute when cd'ing

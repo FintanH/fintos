@@ -82,7 +82,7 @@
     nur.url = "github:nix-community/NUR";
 
     radicle = {
-      url = "git+https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git?rev=5abd7bf55a093341231c8b71953777068eade0e2";
+      url = "git+https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git?rev=a48081f2717f069d456ec09f31d9e639b232dbed";
     };
   };
 }

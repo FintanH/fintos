@@ -39,6 +39,7 @@
     # utils
     btop
     fzf
+    git-sizer
     jq
     ripgrep
     tree
@@ -52,6 +53,7 @@
     # development
     asciidoctor
     delta # git-delta
+    difftastic
     direnv
     niv
 

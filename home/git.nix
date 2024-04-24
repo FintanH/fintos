@@ -22,6 +22,7 @@
     };
     extraConfig = {
       core = {
+        excludesFile = "~/.config/git/ignore";
         pager = "delta";
       };
 

@@ -131,6 +131,13 @@
     enableSSHSupport = true;
   };
 
+  virtualisation = {
+    # Enable common container config files in /etc/containers
+    containers.enable = true;
+    # Enable podman containers
+    podman.enable = true;
+  };
+
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.

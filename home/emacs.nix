@@ -131,6 +131,9 @@
       ;; Shouldn't highlight trailing spaces in terminal mode.
       (add-hook 'term-mode (lambda () (setq show-trailing-whitespace nil)))
       (add-hook 'term-mode-hook (lambda () (setq show-trailing-whitespace nil)))
+
+      ;; Ensure that column width is 80 when using fill-paragraph (M-q)
+      (setq-default fill-column 80)
     '';
 
     usePackage = {

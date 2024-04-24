@@ -44,6 +44,7 @@
       };
 
       diff = {
+        external = "difft";
         colorMoved = "default";
       };
     };

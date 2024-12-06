@@ -71,18 +71,21 @@
 
   inputs = {
     # Official NixOS package source
-    nixpkgs.url = "github:NixOS/nixpkgs/release-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/release-24.05";
 
     # home-manager, used for managing user configuration
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.11";
+      url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nur.url = "github:nix-community/NUR";
 
     radicle = {
-      url = "git+https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git?rev=c607619683e859fd715a23377c03fb08dc8090f4";
+      url = "git+https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git?tag=v1.1.0-pre4";
+    };
+    radicle-tui = {
+      url = "git+https://seed.radicle.xyz/rad:z39mP9rQAaGmERfUMPULfPUi473tY.git?rev=fb4759618f4f09ef7470ce5cfbee7595d681a27a";
     };
   };
 }

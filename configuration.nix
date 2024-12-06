@@ -50,8 +50,8 @@
 
   # Configure keymap in X11
   services.xserver = {
-    layout = "ie";
-    xkbVariant = "";
+    xkb.layout = "ie";
+    xkb.variant = "";
   };
 
   # Configure console keymap
@@ -94,11 +94,14 @@
   users.defaultUserShell = pkgs.zsh;
 
   # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "fintohaps";
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "fintohaps";
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.permittedInsecurePackages = [
+    "jujutsu-0.17.1"
+  ];
 
   # Enable Flakes and the new command-line tool
   nix.settings.experimental-features = ["nix-command" "flakes"];

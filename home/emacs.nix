@@ -48,6 +48,9 @@
                                           (abbreviate-file-name (buffer-file-name))
                                         "%b"))))
 
+      ;; Add line numbers
+      (global-display-line-numbers-mode t)
+
       ;; Shortcut for goto-line
       (global-set-key (kbd "C-c g") 'goto-line)
 

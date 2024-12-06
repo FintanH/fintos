@@ -55,6 +55,7 @@
     delta # git-delta
     difftastic
     direnv
+    jujutsu
     niv
 
     # application
@@ -66,7 +67,7 @@
     inputs.radicle.packages.x86_64-linux.radicle-remote-helper
     inputs.radicle.packages.x86_64-linux.radicle-cli
     inputs.radicle.packages.x86_64-linux.radicle-node
-    inputs.radicle.packages.x86_64-linux.radicle-httpd
+    inputs.radicle-tui.packages.x86_64-linux.radicle-tui
   ];
 
   # Allow direnv to execute when cd'ing

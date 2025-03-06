@@ -33,13 +33,7 @@
       (blink-cursor-mode 0)
 
       ;; Set up fonts early.
-      (set-face-attribute 'default
-                          nil
-                          :height 120
-                          :family "Fantasque Sans Mono")
-      (set-face-attribute 'variable-pitch
-                          nil
-                          :family "DejaVu Sans")
+      (set-frame-font "-CTDB-FiraCode Nerd Font Propo-regular-normal-normal-*-*-*-*-*-*-0-iso10646-1" nil t)
 
       ;; Set frame title.
       (setq frame-title-format
@@ -47,6 +41,9 @@
                                       (if (buffer-file-name)
                                           (abbreviate-file-name (buffer-file-name))
                                         "%b"))))
+
+      ;; Add line numbers
+      (global-display-line-numbers-mode t)
 
       ;; Shortcut for goto-line
       (global-set-key (kbd "C-c g") 'goto-line)

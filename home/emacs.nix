@@ -12,7 +12,6 @@
     enable = true;
     package = pkgs.emacs29;
     extraPackages = epkgs: [
-      epkgs.aider
       epkgs.melpaPackages.aider
     ];
   };

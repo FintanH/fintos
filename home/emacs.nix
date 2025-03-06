@@ -8,7 +8,13 @@
 }: {
   imports = [nurNoPkgs.repos.rycee.hmModules.emacs-init];
 
-  programs.emacs.enable = true;
+  programs.emacs = {
+    enable = true;
+    package = pkgs.emacs29;
+    extraPackages = epkgs: [
+      epkgs.aider
+    ];
+  };
   programs.emacs.init = {
     enable = true;
     recommendedGcSettings = true;
@@ -1094,6 +1100,18 @@
       treemacs-projectile = {
         enable = true;
         after = ["treemacs" "projectile"];
+      };
+
+      aider = {
+        enable = true;
+        after = ["projectile"];
+        bind = {
+          "C-c a" = "aider-open";
+        };
+        config = ''
+          (setq aider-api-key (getenv "OPENAI_API_KEY"))
+          (setq aider-model "gpt-4")
+        '';
       };
     };
   };

@@ -12,7 +12,7 @@
     enable = true;
     package = pkgs.emacs29;
     extraPackages = epkgs: [
-      epkgs.stablePackages.aider
+      epkgs.aider
     ];
   };
   programs.emacs.init = {

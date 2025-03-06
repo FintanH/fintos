@@ -13,6 +13,7 @@
     package = pkgs.emacs29;
     extraPackages = epkgs: [
       epkgs.melpaStablePackages.aider
+      epkgs.stablePackages.aider
     ];
   };
   programs.emacs.init = {

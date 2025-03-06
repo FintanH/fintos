@@ -1103,6 +1103,7 @@
 
       aider = {
         enable = true;
+        package = pkgs.callPackage ./aider.nix {};
         after = ["projectile"];
         bind = {
           "C-c a" = "aider-open";
@@ -1114,4 +1115,22 @@
       };
     };
   };
+}
+{ pkgs }:
+
+let
+  aider = pkgs.fetchFromGitHub {
+    owner = "paul-gauthier";
+    repo = "aider";
+    rev = "v0.14.1";  # Use the latest stable version
+    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";  # This needs to be updated with correct hash
+  };
+in
+pkgs.emacsPackages.trivialBuild {
+  pname = "aider";
+  version = "0.14.1";
+  src = aider;
+  packageRequires = with pkgs.emacsPackages; [
+    projectile
+  ];
 }

@@ -24,6 +24,7 @@
         {name = "zsh-users/zsh-completions";}
         {name = "zsh-users/zsh-autosuggestions";}
         {name = "zsh-users/zsh-syntax-highlighting";}
+        {name = "ryutok/rust-zsh-completions";}
       ];
     };
   };

@@ -18,6 +18,7 @@
     ...
   } @ inputs: let
     pkgs = import nixpkgs {system = "x86_64-linux";};
+    unstable = import inputs.unstable-pkgs {system = "x86_64-linux";};
     nurNoPkgs = import nur {nurpkgs = pkgs;};
     registryModule = [
       {
@@ -60,6 +61,7 @@
               # arguments to home.nix
               home-manager.extraSpecialArgs = {
                 inherit nurNoPkgs;
+                inherit unstable;
                 inherit inputs;
               };
             }
@@ -71,18 +73,33 @@
 
   inputs = {
     # Official NixOS package source
-    nixpkgs.url = "github:NixOS/nixpkgs/release-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
+
+    unstable-pkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # home-manager, used for managing user configuration
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.11";
+      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nur.url = "github:nix-community/NUR";
 
     radicle = {
-      url = "git+https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git?rev=c607619683e859fd715a23377c03fb08dc8090f4";
+      # Use for pinning to a tag
+      url = "git+https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git?ref=refs/namespaces/z6MkireRatUThvd3qzfKht1S44wpm4FEWSSa4PRMTSQZ3voM/refs/tags/v1.2.0";
+
+      # Use for pinning to a particular revision/commit
+      # url = "git+https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git?rev=17139b7e56d5f6e80c1b675873289cd5c08c4823";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+    radicle-desktop = {
+      url = "git+https://seed.radicle.xyz/z4D5UCArafTzTQpDZNQRuqswh3ury.git?rev=da4bbe2fc136918903e20d01f7a1893a4732462c";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Cannot be found?
+    # radicle-tui = {
+    #   url = "git+https://seed.radicle.xyz/z39mP9rQAaGmERfUMPULfPUi473tY.git?ref=refs/namespaces/z6MkgFq6z5fkF2hioLLSNu1zP2qEL1aHXHZzGH1FLFGAnBGz/refs/tags/0.6.0";
+    # };
   };
 }

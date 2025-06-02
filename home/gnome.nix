@@ -22,8 +22,8 @@
 
   environment.systemPackages = with pkgs; [
     # Apps
-    gnome3.gnome-tweaks
-    gnome3.gnome-sound-recorder
+    gnome-tweaks
+    gnome-sound-recorder
 
     # Extensions
     gnomeExtensions.paperwm

@@ -28,7 +28,9 @@
   networking.networkmanager.enable = true;
 
   # Set your time zone.
-  time.timeZone = "Europe/Dublin";
+  # time.timeZone = "Europe/Dublin";
+  # Allow the time zone to be updated automatically.
+  services.automatic-timezoned.enable = true;
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_IE.UTF-8";
@@ -50,8 +52,8 @@
 
   # Configure keymap in X11
   services.xserver = {
-    layout = "ie";
-    xkbVariant = "";
+    xkb.layout = "ie";
+    xkb.variant = "";
   };
 
   # Configure console keymap
@@ -61,7 +63,6 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -94,8 +95,8 @@
   users.defaultUserShell = pkgs.zsh;
 
   # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "fintohaps";
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "fintohaps";
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -135,13 +136,24 @@
     # Enable common container config files in /etc/containers
     containers.enable = true;
     # Enable podman containers
-    podman.enable = true;
+    podman = {
+      enable = true;
+
+      # Create a `docker` alias for podman, to use it as a drop-in replacement
+      dockerCompat = true;
+
+      # Required for containers under podman-compose to be able to talk to each other.
+      defaultNetwork.settings.dns_enabled = true;
+    };
   };
 
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
+
+  # https://github.com/Mic92/envfs
+  services.envfs.enable = true;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

@@ -3,6 +3,7 @@
   lib,
   pkgs,
   inputs,
+  unstable,
   ...
 }: {
   imports = [
@@ -19,13 +20,21 @@
     defaultEditor = true;
   };
 
+  # Enable automatic time zone and location
+  dconf.settings = {
+    "org/gnome/desktop/datetime" = { automatic-timezone = true; };
+    "org/gnome/system/location" = { enabled = true; };
+  };
+
   # Configure fonts
   fonts.fontconfig.enable = true;
 
   # User profile packages
   home.packages = with pkgs; [
-    # Fonts
-    (nerdfonts.override {fonts = ["FiraCode" "DroidSansMono" "DejaVuSansMono" "FantasqueSansMono"];})
+    pkgs.nerd-fonts.fira-code
+    pkgs.nerd-fonts.droid-sans-mono
+    pkgs.nerd-fonts.dejavu-sans-mono
+    pkgs.nerd-fonts.fantasque-sans-mono
 
     # archives
     unzip
@@ -33,7 +42,6 @@
 
     # lsp
     python3
-    semgrep
     rust-analyzer
 
     # utils
@@ -42,9 +50,13 @@
     git-sizer
     jq
     ripgrep
+    rlwrap
     tree
     wget
     which
+
+    # AI
+    aider-chat
 
     # system tools
     pciutils
@@ -55,18 +67,31 @@
     delta # git-delta
     difftastic
     direnv
+    jujutsu # jj
+    jjui
     niv
+
+    # CI/CD
+    docker-compose
+    podman
+    podman-tui
+    unstable.woodpecker-cli
 
     # application
     element-desktop
+    keet
     obsidian
     zoom-us
+
+    # Screensharing
+    xdg-desktop-portal
 
     # radicle
     inputs.radicle.packages.x86_64-linux.radicle-remote-helper
     inputs.radicle.packages.x86_64-linux.radicle-cli
     inputs.radicle.packages.x86_64-linux.radicle-node
-    inputs.radicle.packages.x86_64-linux.radicle-httpd
+    inputs.radicle-desktop.packages.x86_64-linux.radicle-desktop
+    # inputs.radicle-tui.packages.x86_64-linux.radicle-tui
   ];
 
   # Allow direnv to execute when cd'ing

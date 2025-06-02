@@ -26,6 +26,11 @@
         pager = "delta";
       };
 
+      # Displaying branches and tags in a better order
+      column.ui = "auto";
+      branch.sort = "-committerdate";
+      tag.sort = "version:refname";
+
       delta = {
         # use n and N to move between diff sections
         navigate = true;
@@ -39,11 +44,37 @@
         hunk-header-style = "line-number syntax";
       };
 
+      fetch = {
+        # Prune remote branches and tags if they have been removed on the remote
+        prune = true;
+        pruneTags = true;
+      };
+
+      # Helps rebasing with conflicts by remembering the resolutions
+      rerere = {
+        enabled = true;
+        autoupdate = true;
+      };
+
+      # Prompt for the fixed command when a typo is made
+      help.autocorrect = "prompt";
+
+      # Shows diff when committing, i.e. git commit -v
+      commit = {
+        verbose = true;
+        gpgSign = true;
+      };
+
+      format.signOff = true;
+
       merge = {
-        conflictstyle = "diff3";
+        conflictstyle = "zdiff3";
       };
 
       diff = {
+        algorithm = "histogram";
+        renames = true;
+        mnemonicPrefix = true;
         external = "difft";
         colorMoved = "default";
       };

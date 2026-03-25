@@ -4,9 +4,11 @@
   nixConfig = {
     extra-substituters = [
       "https://nix-community.cachix.org"
+      "https://cache.numtide.com"
     ];
     extra-trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
     ];
   };
 
@@ -15,9 +17,18 @@
     nixpkgs,
     home-manager,
     nur,
+    microvm,
+    sops-nix,
     ...
   } @ inputs: let
-    pkgs = import nixpkgs {system = "x86_64-linux";};
+    pkgs = import nixpkgs {
+      system = "x86_64-linux";
+      overlays = [
+        (import ./overlays/radicle-node.nix)
+        inputs.opencode.overlays.default
+      ];
+    };
+    unstable = import inputs.nixpkgs-unstable {system = "x86_64-linux";};
     nurNoPkgs = import nur {nurpkgs = pkgs;};
     registryModule = [
       {
@@ -46,6 +57,7 @@
       # To deploy this NixOS system (from any directory):
       #   sudo nixos-rebuild switch --flake fintos
       "haptop" = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs nurNoPkgs;};
         modules =
           [
             ./configuration.nix
@@ -60,9 +72,19 @@
               # arguments to home.nix
               home-manager.extraSpecialArgs = {
                 inherit nurNoPkgs;
+                inherit unstable;
                 inherit inputs;
               };
             }
+            {
+              nixpkgs.overlays = [
+                (import ./overlays/radicle-node.nix)
+              ];
+            }
+            microvm.nixosModules.host
+            ./microvm/network.nix
+            ./microvm/vm-home.nix
+            ./microvm.nix
           ]
           ++ registryModule;
       };
@@ -71,21 +93,29 @@
 
   inputs = {
     # Official NixOS package source
-    nixpkgs.url = "github:NixOS/nixpkgs/release-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/release-25.11";
+
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # home-manager, used for managing user configuration
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
+      # url = "git+https://github.com/lorenzleutgeb/home-manager.git?rev=4a0213a852c4c8100b706cae04ea54dbe1e8f956";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nur.url = "github:nix-community/NUR";
 
-    radicle = {
-      url = "git+https://seed.radicle.xyz/z3gqcJUoA1n9HaHKufZs5FCSGazv5.git?tag=v1.1.0-pre4";
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
-    radicle-tui = {
-      url = "git+https://seed.radicle.xyz/rad:z39mP9rQAaGmERfUMPULfPUi473tY.git?rev=fb4759618f4f09ef7470ce5cfbee7595d681a27a";
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+    opencode.url = "github:dan-online/opencode-nix";
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 }

@@ -3,20 +3,35 @@
   lib,
   pkgs,
   inputs,
+  unstable,
   ...
-}: {
+}: let
+  # Define custom packages
+  destiny = pkgs.callPackage ./home/destiny.nix {};
+in {
   imports = [
-    ./home/emacs.nix
+    ./home/emacs
     ./home/git.nix
+    ./home/opencode.nix
+    ./home/secrets.nix
     ./home/starship.nix
     ./home/zsh.nix
+    ./hm/services/radicle.nix
+    ./hm/profiles/radicle.nix
+    ./hm/profiles/rust.nix
   ];
-
   home.username = "fintohaps";
   home.homeDirectory = "/home/fintohaps";
+
   services.emacs = {
     enable = true;
     defaultEditor = true;
+  };
+
+  # Enable automatic time zone and location
+  dconf.settings = {
+    "org/gnome/desktop/datetime" = {automatic-timezone = true;};
+    "org/gnome/system/location" = {enabled = true;};
   };
 
   # Configure fonts
@@ -24,8 +39,10 @@
 
   # User profile packages
   home.packages = with pkgs; [
-    # Fonts
-    (nerdfonts.override {fonts = ["FiraCode" "DroidSansMono" "DejaVuSansMono" "FantasqueSansMono"];})
+    pkgs.nerd-fonts.fira-code
+    pkgs.nerd-fonts.droid-sans-mono
+    pkgs.nerd-fonts.dejavu-sans-mono
+    pkgs.nerd-fonts.fantasque-sans-mono
 
     # archives
     unzip
@@ -33,18 +50,32 @@
 
     # lsp
     python3
-    semgrep
-    rust-analyzer
 
     # utils
+    age
     btop
     fzf
+    ghostty
     git-sizer
     jq
+    magic-wormhole
+    pdftk # PDF editing tool
     ripgrep
+    rlwrap
+    # Enable use of sshfs
+    # See: nixos.org/manual/nixos/stable/#sec-sshfs-file-systems
+    sshfs
     tree
+    xclip
     wget
     which
+
+    # age & sops
+    sops
+    ssh-to-age
+
+    # AI
+    aider-chat
 
     # system tools
     pciutils
@@ -55,19 +86,35 @@
     delta # git-delta
     difftastic
     direnv
-    jujutsu
+    jujutsu # jj
+    jjui
+    lazyjj
+    just
+    mergiraf
     niv
+    sequoia-sqop # stateless GPG key generating
+
+    # Nix caching
+    attic-client
+
+    # CI/CD
+    docker-compose
+    podman
+    podman-tui
+    unstable.woodpecker-cli
 
     # application
+    destiny
     element-desktop
+    keet
     obsidian
     zoom-us
 
-    # radicle
-    inputs.radicle.packages.x86_64-linux.radicle-remote-helper
-    inputs.radicle.packages.x86_64-linux.radicle-cli
-    inputs.radicle.packages.x86_64-linux.radicle-node
-    inputs.radicle-tui.packages.x86_64-linux.radicle-tui
+    # Screensharing
+    xdg-desktop-portal
+
+    # Ed25519 Seed Phrase Backup
+    melt
   ];
 
   # Allow direnv to execute when cd'ing

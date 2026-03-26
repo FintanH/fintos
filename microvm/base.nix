@@ -86,7 +86,7 @@ in {
   # ── Secrets ───────────────────────────────────────────────────
   sops = {
     age.sshKeyPaths = [
-      "/run/credentials/microvm@${vmName}.service/ssh_host_ed25519_key"
+      "/etc/ssh/host-keys/ssh_host_ed25519_key"
     ];
 
     defaultSopsFile = ../secrets/secrets.yaml;
@@ -185,6 +185,13 @@ in {
         # See: modules/nixos/vm-home.nix
         source = "/home/${user}/.vm-home";
         mountPoint = "/home/${user}";
+      }
+      # SSH host keys (stable across rebuilds)
+      {
+        proto = "virtiofs";
+        tag = "ssh-keys";
+        source = "${workspace}/ssh-host-keys";
+        mountPoint = "/etc/ssh/host-keys";
       }
     ];
 

@@ -7,8 +7,6 @@
 # - Mounts complete before microvm@.service starts virtiofsd
 # - Handles missing source paths gracefully with ConditionPathExists
 # - Correctly bind-mounts files (not just directories)
-#
-# See: microvm-security/tasks/001-scope-home-directory-access.md
 {config, lib, ...}: let
   user = "fintohaps";
   vmHome = "/home/${user}/.vm-home";
@@ -43,6 +41,11 @@
     }
     {
       src = ".emacs.d";
+      ro = false;
+      required = false;
+    }
+    {
+      src = ".local/share/zsh";
       ro = false;
       required = false;
     }

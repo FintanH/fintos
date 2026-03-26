@@ -35,9 +35,6 @@ in {
         })
         ./microvms/playground.nix
       ];
-      microvm.credentialFiles = {
-        ssh_host_ed25519_key = "/home/${user}/microvm/playground/ssh-host-keys/ssh_host_ed25519_key";
-      };
     };
   };
 
@@ -58,17 +55,8 @@ in {
         })
         ./microvms/pi.nix
       ];
-      microvm.credentialFiles = {
-        ssh_host_ed25519_key = "/var/lib/microvm-keys/pi/ssh_host_ed25519_key";
-      };
     };
   };
-
-  systemd.tmpfiles.rules = [
-    "d /var/lib/microvm-keys 0550 microvm microvm -"
-    "d /var/lib/microvm-keys/pi 0550 microvm microvm -"
-    "z /var/lib/microvm-keys/pi/ssh_host_ed25519_key 0400 microvm microvm -"
-  ];
 
   # ── Add more VMs below ────────────────────────────────────────
   # microvm.vms.myprojectvm = { ... };

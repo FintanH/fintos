@@ -169,6 +169,20 @@
   # Enable Flakes and the new command-line tool
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
+  # ── Nix Garbage Collection ─────────────────────────────────────
+  nix.gc = {
+    automatic = true;
+    dates = "daily";
+    options = "--delete-older-than 7d";
+  };
+
+  nix.settings.auto-optimise-store = true;
+
+  nix.extraOptions = ''
+    min-free = ${toString (50 * 1024 * 1024 * 1024)}
+    max-free = ${toString (100 * 1024 * 1024 * 1024)}
+  '';
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [

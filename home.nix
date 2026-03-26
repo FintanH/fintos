@@ -123,6 +123,37 @@ in {
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+    stdlib = ''
+            # Generate .nixd.json for nixd LSP support
+            use_nixd() {
+              local nixd_json=".nixd.json"
+
+              # Skip if .nixd.json already exists and is tracked by git
+              if [[ -f "$nixd_json" ]] && git ls-files --error-unmatch "$nixd_json" &>/dev/null 2>&1; then
+                log_status "using existing tracked .nixd.json"
+                return 0
+              fi
+
+              # Generate basic .nixd.json for nixpkgs completions
+              cat > "$nixd_json" << 'NIXD_EOF'
+      {
+        "nixpkgs": {
+          "expr": "import <nixpkgs> { }"
+        }
+      }
+      NIXD_EOF
+
+              log_status "generated .nixd.json for nixd"
+
+              # Add to .git/info/exclude if in a git repo
+              if [[ -d ".git" ]]; then
+                local exclude_file=".git/info/exclude"
+                if ! grep -q "^\.nixd\.json$" "$exclude_file" 2>/dev/null; then
+                  echo ".nixd.json" >> "$exclude_file"
+                fi
+              fi
+            }
+    '';
   };
 
   # alacritty - a cross-platform, GPU-accelerated terminal emulator

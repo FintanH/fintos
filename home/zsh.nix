@@ -12,6 +12,7 @@
       path = "${config.xdg.dataHome}/zsh/history";
     };
     initContent = ''
+      fpath+=(${pkgs.zsh-completions}/share/zsh/site-functions)
       autoload -U colors && colors;
       eval "$(direnv hook zsh)";
     '';
@@ -28,14 +29,12 @@
       # Arg 2: Patch ID, e.g. "d9d44fed19d98f67374297c899cd969733b26958"
       rad-patch-url = "f() {rad config | jq -r .publicExplorer | sed -e 's/\$host/$1/' -e 's/\$rid/$(rad .)/' -e 's/\$path/\/patches\/$2/'};f";
     };
-    zplug = {
-      enable = true;
-      plugins = [
-        {name = "zsh-users/zsh-completions";}
-        {name = "zsh-users/zsh-autosuggestions";}
-        {name = "zsh-users/zsh-syntax-highlighting";}
-        {name = "ryutok/rust-zsh-completions";}
-      ];
-    };
+    plugins = [
+      {
+        name = "zsh-autosuggestions";
+        src = pkgs.zsh-autosuggestions;
+        file = "share/zsh-autosuggestions/zsh-autosuggestions.zsh";
+      }
+    ];
   };
 }

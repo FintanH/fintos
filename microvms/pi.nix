@@ -1,5 +1,3 @@
-# microvms/pi.nix
-#
 # Pi-specific NixOS config layered on top of microvm/base.nix.
 # Imported in microvm.nix alongside microvms/playground.nix.
 #
@@ -10,6 +8,7 @@
 #
 # This file adds:
 #   - pi-coding-agent via hm/module/programs/pi.nix
+#   - openskills for cross-agent skill synchronization
 #   - virtiofs share of /run/vm-secrets/pi (scoped secrets, avoids sops inside VM)
 #   - tmux (needed for pi sub-agent pattern)
 #
@@ -18,7 +17,6 @@
   pkgs,
   lib,
   inputs,
-  nurNoPkgs,
   ...
 }: {
   # Overlay: make pkgs.llm-agents.pi available inside the guest.
@@ -48,6 +46,7 @@
   # Extra system packages
   environment.systemPackages = with pkgs; [
     tmux # pi's recommended mechanism for background/sub-agent processes
+    pkgs.llm-agents.openskills # cross-agent skill synchronization
   ];
 
   # Inject the pi home-manager module.
@@ -76,35 +75,26 @@
       # path, so ~/Developer/AgentSkills is already accessible in the VM.
       devSkillsMount = "/home/fintohaps/Developer/AgentSkills";
       devSkillNames = [
-        # "my-draft-skill"
+        "radicle-dev/rust-tdd"
+        "radicle-dev/rust-functional"
+        "radicle-dev/rust-types"
+        "radicle-dev/crdt-development"
+        "radicle-dev/distributed-systems"
+        "radicle-dev/git-internals"
+        "radicle-dev/radicle-cobs"
+        "Rust/rust-skills-rules"
       ];
+
+      # Enable extended thinking for complex CRDT/distributed systems work
+      extraSettings = {
+        thinking = "medium";
+      };
 
       npmPackages = [
         "npm:@mariozechner/pi-plan-mode"
         # "npm:@mariozechner/pi-subagent"
       ];
-
-      agentsMd = ''
-        # Global agent instructions
-
-        ## Environment
-        - Running inside NixOS microvm `pi-vm` on `haptop`.
-        - /home/fintohaps is shared from the host via virtiofs (same path).
-        - ~/Developer/AgentSkills is editable on the host; changes are live here.
-        - Stable skills are symlinked from /nix/store into ~/.pi/agent/skills/.
-        - Rebuild: `sudo nixos-rebuild switch --flake fintos`
-        - SSH to this VM from the host: `ssh fintohaps@192.168.83.8`
-
-        ## Nix conventions
-        - Format all .nix files with alejandra (`nix fmt`).
-        - Packages not in nixpkgs -> overlay/<n>.nix (overlay function).
-        - Home-manager modules -> hm/module/programs/ or hm/module/services/.
-        - Per-VM NixOS extras -> microvms/<n>.nix (layered on microvm/base.nix).
-
-        ## Pi workflow
-        - Use tmux for long-running processes (pi has no background bash).
-        - Sub-agents: spawn `pi` instances in separate tmux windows/panes.
-      '';
+      agentsMd = builtins.readFile ./pi/agent.md;
     };
 
     programs.tmux = {

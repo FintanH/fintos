@@ -13,15 +13,13 @@
   realHome = "/home/${user}";
 
   # Share specifications: src, dst, ro (read-only), required, isFile
+  #
+  # NOTE: do not share files and directories that are already managed by
+  # home-manager, e.g. `.config/git`.
   shares = [
     {
       src = "Developer";
       ro = false;
-      required = true;
-    }
-    {
-      src = ".config/git";
-      ro = true;
       required = true;
     }
     {

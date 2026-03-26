@@ -1,5 +1,5 @@
 final: prev: let
-  version = "1.8.0-rc.2";
+  version = "1.8.0-rc.3";
   prevName = "radicle-node";
   finalName = "${prevName}-overlay";
 in {
@@ -10,7 +10,7 @@ in {
     src = final.fetchgit {
       inherit (prevAttrs.src) url;
       tag = "releases/${version}";
-      hash = "sha256-J+1URp8mzxdKwlNpgYtaEQBDSyDVYqsAMnxwogZWVWM=";
+      hash = "sha256-W94Vwf7ozwkENLueKF9Lvkns7HRX7PbMtvMHMCujV/s=";
       leaveDotGit = true;
       postFetch = ''
         git -C $out rev-parse HEAD > $out/.git_head

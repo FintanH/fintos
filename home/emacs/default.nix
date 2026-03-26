@@ -358,15 +358,9 @@
         '';
       };
 
+      # company-lsp is deprecated - lsp-mode now uses company-capf
       company-lsp = {
-        enable = true;
-        after = ["company"];
-        command = ["company-lsp"];
-        config = ''
-          (setq company-lsp-enable-snippet t
-                company-lsp-async t
-                company-lsp-cache-candidates 'auto)
-        '';
+        enable = false;
       };
 
       lsp-ui = {
@@ -404,7 +398,8 @@
         };
         config = ''
           (setq lsp-eldoc-render-all nil
-                lsp-prefer-flymake nil)
+                lsp-prefer-flymake nil
+                lsp-completion-provider :capf)
         '';
       };
 

@@ -49,6 +49,8 @@ in {
     zip
 
     # lsp
+    nixd
+    alejandra
     python3
 
     # utils

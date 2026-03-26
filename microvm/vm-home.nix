@@ -73,6 +73,9 @@
       (i: "d ${vmHome}/${lib.concatStringsSep "/" (lib.sublist 0 i parentParts)} 0755 ${user} users -")
       (lib.range 1 (lib.length parentParts));
 
+  # Systemd mount unit name for the tmpfs base
+  vmHomeMountUnit = "home-fintohaps-.vm\\x2dhome.mount";
+
   # Generate systemd mount unit
   mkMount = share: {
     what = "${realHome}/${share.src}";
@@ -84,8 +87,11 @@
       + (lib.optionalString (!(share.required)) ",nofail");
     wantedBy = ["vm-home-mounts.target"];
     before = ["microvm@.service"];
-    after = ["systemd-tmpfiles-setup.service"];
+    # Bind mounts MUST come after the tmpfs is mounted, otherwise
+    # remounting tmpfs will cover them up
+    after = ["systemd-tmpfiles-setup.service" vmHomeMountUnit];
     requires = ["systemd-tmpfiles-setup.service"];
+    bindsTo = [vmHomeMountUnit];
     unitConfig =
       {
         RequiresMountsFor = "${realHome} ${vmHome}";

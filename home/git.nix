@@ -19,6 +19,15 @@
 in {
   programs.git = {
     enable = true;
+    ignores = [
+      # direnv files
+      ".direnv"
+      ".envrc"
+
+      # emacs files
+      "*~undo-tree~"
+      "**/.\\#*"
+    ];
     settings = {
       inherit user aliases;
 

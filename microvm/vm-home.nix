@@ -95,6 +95,14 @@
       });
   };
 in {
+  # Mount .vm-home as tmpfs for a fresh state on every boot
+  # This ensures removed entries don't persist as stale directories
+  fileSystems.${vmHome} = {
+    device = "tmpfs";
+    fsType = "tmpfs";
+    options = ["mode=0755" "uid=1000" "gid=100" "size=1M"];
+  };
+
   # Target that groups all VM home mounts; microvm service waits for this
   systemd.targets.vm-home-mounts = {
     description = "VM Home Directory Bind Mounts";
@@ -103,9 +111,9 @@ in {
   };
 
   # Create mount point directories and files
+  # Note: base ${vmHome} directory is created by the tmpfs mount
   systemd.tmpfiles.rules =
-    ["d ${vmHome} 0755 ${user} users -"]
-    ++ lib.flatten (map mkParentDirRules shares)
+    lib.flatten (map mkParentDirRules shares)
     ++ map mkMountPointRule shares;
 
   # Bind mounts with proper ordering

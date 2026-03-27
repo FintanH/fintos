@@ -28,6 +28,12 @@
       # Arg 1: Host URL, e.g. "seed.radicle.xyz"
       # Arg 2: Patch ID, e.g. "d9d44fed19d98f67374297c899cd969733b26958"
       rad-patch-url = "f() {rad config | jq -r .publicExplorer | sed -e 's/\$host/$1/' -e 's/\$rid/$(rad .)/' -e 's/\$path/\/patches\/$2/'};f";
+
+      # SSH into pi-vm with OAuth callback ports forwarded
+      # - Port 51515: Claude Code (via MCP_OAUTH_CALLBACK_PORT)
+      # - Port 53692: Pi coding agent (hardcoded in pi-mono)
+      # Usage: ssh-pi-oauth, then run `claude login` or `pi` → `/login`
+      ssh-pi-oauth = "ssh -L 51515:localhost:51515 -L 53692:localhost:53692 fintohaps@192.168.83.8";
     };
     plugins = [
       {

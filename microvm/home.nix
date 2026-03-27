@@ -30,6 +30,10 @@
     home.homeDirectory = "/home/${user}";
     xdg.enable = true;
 
+    # Fixed OAuth callback port for claude login via SSH port forwarding.
+    # On the host, use `ssh-pi-oauth` alias to forward this port.
+    home.sessionVariables.MCP_OAUTH_CALLBACK_PORT = "51515";
+
     opencode.anthropicKeyFile = "/run/secrets/anthropic_api_key";
     opencode.geminiKeyFile = "/run/secrets/gemini_api_key";
 

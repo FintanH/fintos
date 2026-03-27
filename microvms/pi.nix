@@ -49,14 +49,33 @@
     pkgs.llm-agents.openskills # cross-agent skill synchronization
   ];
 
-  # Inject the pi home-manager module.
-  # home-manager.sharedModules makes our module available to all users.
+  # Inject the pi and openskills home-manager modules.
+  # home-manager.sharedModules makes our modules available to all users.
   # home-manager.users.fintohaps is merged with the block in base.nix.
   home-manager.sharedModules = [
     ../hm/module/programs/pi.nix
+    ../hm/module/programs/openskills.nix
   ];
 
   home-manager.users.fintohaps = {
+    # OpenSkills - remote skill installation
+    programs.openskills = {
+      enable = true;
+      package = pkgs.llm-agents.openskills;
+
+      remoteSkills = [
+        # Security & Crypto (critical for Radicle P2P)
+        "trailofbits/skills"
+
+        # Rust development methodology
+        "obra/superpowers"
+
+        # Additional security (MITRE ATT&CK mapped)
+        {source = "mukul975/Anthropic-Cybersecurity-Skills";}
+      ];
+    };
+
+    # Pi - coding agent with local + openskills paths
     programs.pi = {
       enable = true;
       package = pkgs.llm-agents.pi;
@@ -85,15 +104,26 @@
         "Rust/rust-skills-rules"
       ];
 
-      # Enable extended thinking for complex CRDT/distributed systems work
+      # Pi plugins (full stack for Rust/Radicle development)
+      npmPackages = [
+        "npm:@mariozechner/pi-plan-mode" # Structured planning
+        "npm:pi-superpowers-plus" # TDD enforcement (RED→GREEN→REFACTOR)
+        "npm:pi-cost-dashboard" # API cost monitoring
+        "npm:pi-notify-pp" # Desktop notifications
+        "git:github.com/can1357/oh-my-pi" # Atomic git commits, LSP
+        "git:github.com/jayshah5696/pi-agent-extensions" # Interactive code review
+      ];
+
       extraSettings = {
+        # Enable extended thinking for complex CRDT/distributed systems work
         thinking = "medium";
+        # Include openskills directories for skill discovery
+        skills = [
+          "~/.claude/skills" # openskills global
+          "~/.agent/skills" # openskills universal
+        ];
       };
 
-      npmPackages = [
-        "npm:@mariozechner/pi-plan-mode"
-        # "npm:@mariozechner/pi-subagent"
-      ];
       agentsMd = builtins.readFile ./pi/agent.md;
     };
 

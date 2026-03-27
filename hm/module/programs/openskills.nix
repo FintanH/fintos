@@ -1,7 +1,7 @@
 # Home-manager module for [openskills] universal skills loader.
 # Provides cross-agent skill synchronization via AGENTS.md.
 #
-# [openskills]: packages/openskills/package.nix
+# [openskills]: https://github.com/numman-ali/openskills
 #
 # Usage:
 #
@@ -9,6 +9,10 @@
 #   programs.openskills = {
 #     enable = true;
 #     package = pkgs.llm-agents.openskills;
+#     remoteSkills = [
+#       "obra/superpowers"
+#       { source = "trailofbits/skills"; ref = "main"; }
+#     ];
 #   };
 #
 {
@@ -18,6 +22,29 @@
   ...
 }: let
   cfg = config.programs.openskills;
+
+  # Submodule for remote skills with optional pinning
+  remoteSkillType = lib.types.submodule {
+    options = {
+      source = lib.mkOption {
+        type = lib.types.str;
+        example = "trailofbits/skills";
+        description = "GitHub user/repo or marketplace name.";
+      };
+      ref = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "v1.0.0";
+        description = "Git ref to pin (tag, branch, commit). Reserved for future use.";
+      };
+    };
+  };
+
+  # Extract source string from either a plain string or a submodule
+  getSource = skill:
+    if builtins.isString skill
+    then skill
+    else skill.source;
 in {
   options.programs.openskills = {
     enable = lib.mkEnableOption "openskills universal skills loader";
@@ -31,13 +58,19 @@ in {
       example = lib.literalExpression "pkgs.llm-agents.openskills";
     };
 
-    skillSources = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
+    remoteSkills = lib.mkOption {
+      type = lib.types.listOf (lib.types.either lib.types.str remoteSkillType);
       default = [];
-      example = ["obra/superpowers" "./local-skill"];
+      example = lib.literalExpression ''
+        [
+          "obra/superpowers"
+          { source = "trailofbits/skills"; ref = "main"; }
+        ]
+      '';
       description = ''
-        Skills to install via `openskills install` during activation.
-        Can be GitHub repos (user/repo), local paths, or marketplace names.
+        Remote skills to install via `openskills install` during activation.
+        Can be GitHub repos (user/repo) or marketplace names.
+        Use the submodule form to specify a git ref (reserved for future pinning support).
       '';
     };
 
@@ -74,16 +107,19 @@ in {
 
     # Install configured skills on activation
     home.activation.openskillsInstall =
-      lib.mkIf (cfg.skillSources != [])
+      lib.mkIf (cfg.remoteSkills != [])
       (lib.hm.dag.entryAfter ["writeBoundary"] ''
         export PATH="${cfg.package}/bin:$PATH"
-        ${lib.concatMapStringsSep "\n" (src: ''
+        ${lib.concatMapStringsSep "\n" (skill: let
+            src = getSource skill;
+          in ''
+            echo "Installing skill: ${src}"
             $DRY_RUN_CMD openskills install ${lib.escapeShellArg src} \
               ${lib.optionalString cfg.globalInstall "--global"} \
               ${lib.optionalString cfg.universalFormat "--universal"} \
-              || true
+              || echo "Warning: Failed to install ${src}" >&2
           '')
-          cfg.skillSources}
+          cfg.remoteSkills}
       '');
 
     # Sync AGENTS.md on activation

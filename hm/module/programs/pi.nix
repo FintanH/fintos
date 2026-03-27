@@ -132,9 +132,23 @@ in {
     extraSettings = lib.mkOption {
       type = lib.types.attrs;
       default = {};
+      example = lib.literalExpression ''
+        {
+          thinking = "medium";
+          skills = [
+            "~/.claude/skills"
+            "~/.agent/skills"
+          ];
+        }
+      '';
       description = ''
         Additional key-value pairs merged into settings.json verbatim.
-        See pi docs for supported fields.
+
+        Common fields:
+        - thinking: "off" | "low" | "medium" | "high" — extended thinking level
+        - skills: list of additional skill discovery paths (e.g., openskills directories)
+
+        See pi docs for all supported fields.
       '';
     };
 

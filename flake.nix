@@ -83,7 +83,6 @@
             }
             microvm.nixosModules.host
             ./microvm/network.nix
-            ./microvm/vm-home.nix
             ./microvm.nix
           ]
           ++ registryModule;

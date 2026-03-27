@@ -83,6 +83,12 @@ in {
     ];
   };
 
+  # ── Home directory setup ─────────────────────────────────────
+  # Ensure home directory has correct ownership (runs after filesystems mount)
+  systemd.tmpfiles.rules = [
+    "d /home/${user} 0755 ${user} ${user} -"
+  ];
+
   # ── Secrets ───────────────────────────────────────────────────
   sops = {
     age.sshKeyPaths = [
@@ -156,17 +162,22 @@ in {
     # Required for home-manager activation / nix-daemon.
     writableStoreOverlay = "/nix/.rw-store";
 
-    # 100 GB persistent /var volume (stored in /var/lib/microvms/<name>/)
+    # Persistent volumes (stored in /var/lib/microvms/<name>/)
     volumes = [
       {
         mountPoint = "/var";
         image = "var.img";
-        size = 102400; # MB
+        size = 102400; # 100 GB
       }
       {
         mountPoint = "/nix/.rw-store";
         image = "nix-store.img";
         size = 61440; # 60 GB for nix store
+      }
+      {
+        mountPoint = "/home/${user}";
+        image = "home.img";
+        size = 102400; # 100 GB for home directory
       }
     ];
 
@@ -178,13 +189,12 @@ in {
         source = "/nix/store";
         mountPoint = "/nix/.ro-store";
       }
+      # Developer directory shared from host (read-write)
       {
         proto = "virtiofs";
-        tag = "home";
-        # Use scoped .vm-home instead of full home directory
-        # See: modules/nixos/vm-home.nix
-        source = "/home/${user}/.vm-home";
-        mountPoint = "/home/${user}";
+        tag = "developer";
+        source = "/home/${user}/Developer";
+        mountPoint = "/home/${user}/Developer";
       }
       # SSH host keys (stable across rebuilds)
       {

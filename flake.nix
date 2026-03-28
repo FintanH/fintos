@@ -25,6 +25,7 @@
       system = "x86_64-linux";
       overlays = [
         (import ./overlays/radicle-node.nix)
+        (import ./overlays/pi-packages.nix)
         inputs.opencode.overlays.default
       ];
     };
@@ -79,6 +80,7 @@
             {
               nixpkgs.overlays = [
                 (import ./overlays/radicle-node.nix)
+                (import ./overlays/pi-packages.nix)
               ];
             }
             microvm.nixosModules.host

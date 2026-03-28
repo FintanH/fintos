@@ -109,7 +109,7 @@ in {
     home.activation.openskillsInstall =
       lib.mkIf (cfg.remoteSkills != [])
       (lib.hm.dag.entryAfter ["writeBoundary"] ''
-        export PATH="${cfg.package}/bin:$PATH"
+        export PATH="${cfg.package}/bin:${pkgs.git}/bin:$PATH"
         ${lib.concatMapStringsSep "\n" (skill: let
             src = getSource skill;
           in ''

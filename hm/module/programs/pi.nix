@@ -8,7 +8,16 @@
 #   imports = [ ../hm/module/programs/pi.nix ];
 #   programs.pi.enable = true;
 #
-# Full usage with all options: see option definitions below.
+# Pi packages can be managed two ways:
+#
+#   # Nix derivations (peer-deps-only packages, fully declarative)
+#   programs.pi.packages = [ pkgs.piPackages.plan-mode ];
+#
+#   # Pi-managed sources (packages with runtime deps, git repos)
+#   programs.pi.packageSources = [
+#     "npm:pi-fetch"
+#     "git:github.com/can1357/oh-my-pi"
+#   ];
 #
 {
   config,
@@ -18,11 +27,22 @@
 }: let
   cfg = config.programs.pi;
 
-  # Build settings.json, merging provider/model with any extraSettings
+  # Nix packages become local path references; source strings pass through.
+  allPackages =
+    (map toString cfg.packages)
+    ++ cfg.packageSources;
+
+  # Whether any packageSources use npm: (requires writable npm prefix on NixOS).
+  hasNpmSources = lib.any (s: lib.hasPrefix "npm:" s) cfg.packageSources;
+
+  # Build settings.json, merging provider/model, packages, and extraSettings.
   settingsJson =
     {
       provider = cfg.provider;
       model = cfg.defaultModel;
+    }
+    // lib.optionalAttrs (allPackages != []) {
+      packages = allPackages;
     }
     // lib.optionalAttrs (cfg.extraSettings != {}) cfg.extraSettings;
 
@@ -109,14 +129,36 @@ in {
       '';
     };
 
-    npmPackages = lib.mkOption {
+    packages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [];
+      example = lib.literalExpression "[ pkgs.piPackages.plan-mode ]";
+      description = ''
+        Pi extension packages as Nix derivations. Each is a directory
+        with a package.json and pi manifest. Referenced as Nix store
+        paths in settings.json — fully declarative, reproducible,
+        and rollbackable.
+
+        Use this for packages that have only peerDependencies (which
+        pi provides at runtime). See overlays/pi-packages.nix.
+      '';
+    };
+
+    packageSources = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [];
-      example = ["npm:@mariozechner/pi-plan-mode"];
+      example = [
+        "npm:pi-fetch"
+        "git:github.com/can1357/oh-my-pi"
+      ];
       description = ''
-        Pi packages installed via `pi install` during home-manager
-        activation. Idempotent. Land in ~/.pi/packages/ (writable
-        state, not tracked by Nix).
+        Pi package sources that pi manages itself (npm: and git:
+        specifiers). Use this for packages that have runtime
+        dependencies requiring npm install, or complex git repos.
+
+        These are written to settings.json and pi resolves them at
+        startup. Less pure than `packages` but necessary for packages
+        that cannot be trivially built as Nix derivations.
       '';
     };
 
@@ -173,7 +215,16 @@ in {
       }
       // lib.optionalAttrs (cfg.agentsMd != "") {
         ".pi/agent/AGENTS.md".text = cfg.agentsMd;
+      }
+      // lib.optionalAttrs hasNpmSources {
+        # On NixOS, npm's global prefix defaults to the read-only Nix store.
+        # Redirect it to a writable location when packageSources use npm:.
+        ".npmrc".text = ''
+          prefix=''${HOME}/.npm-global
+        '';
       };
+
+    home.sessionPath = lib.mkIf hasNpmSources ["$HOME/.npm-global/bin"];
 
     # Export API key from the secret file into the shell.
     # pi reads ANTHROPIC_API_KEY natively; we never put the key in settings.json.
@@ -182,16 +233,5 @@ in {
         export ANTHROPIC_API_KEY="$(cat ${cfg.apiKeyFile})"
       fi
     '';
-
-    # Install npm-sourced pi packages on activation (idempotent).
-    home.activation.piInstallPackages =
-      lib.mkIf (cfg.npmPackages != [])
-      (lib.hm.dag.entryAfter ["writeBoundary"] ''
-        export PATH="${cfg.package}/bin:$PATH"
-        ${lib.concatMapStringsSep "\n" (pkg: ''
-            $DRY_RUN_CMD pi install ${lib.escapeShellArg pkg} || true
-          '')
-          cfg.npmPackages}
-      '');
   };
 }

@@ -47,6 +47,13 @@
   environment.systemPackages = with pkgs; [
     tmux # pi's recommended mechanism for background/sub-agent processes
     pkgs.llm-agents.openskills # cross-agent skill synchronization
+
+    # required for pi package installation
+    nodejs
+    git
+
+    # RustDex CLI binary (code indexer for pi-rustdex extension)
+    rustdex
   ];
 
   # Inject the pi and openskills home-manager modules.
@@ -104,18 +111,23 @@
         "Rust/rust-skills-rules"
       ];
 
-      # Pi plugins (full stack for Rust/Radicle development)
-      npmPackages = [
-        "npm:@mariozechner/pi-plan-mode" # Structured planning
-        "npm:pi-superpowers-plus" # TDD enforcement (RED→GREEN→REFACTOR)
-        "npm:pi-cost-dashboard" # API cost monitoring
-        "npm:pi-notify-pp" # Desktop notifications
+      # Pi packages as Nix derivations (peer-deps-only, fully declarative)
+      packages = with pkgs.piPackages; [
+        plan-mode # Structured planning (/plan)
+        superpowers-plus # TDD enforcement (RED→GREEN→REFACTOR)
+        gitnexus # Git integration
+        rustdex # Rust documentation lookup
+      ];
+
+      # Pi-managed sources (packages with runtime deps or complex git repos)
+      packageSources = [
+        "npm:@zenobius/pi-worktrees" # Git worktree management
+        "npm:pi-fetch" # URL fetching
         "git:github.com/can1357/oh-my-pi" # Atomic git commits, LSP
         "git:github.com/jayshah5696/pi-agent-extensions" # Interactive code review
       ];
 
       extraSettings = {
-        # Enable extended thinking for complex CRDT/distributed systems work
         thinking = "medium";
         # Include openskills directories for skill discovery
         skills = [

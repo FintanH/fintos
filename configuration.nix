@@ -183,6 +183,18 @@
     max-free = ${toString (100 * 1024 * 1024 * 1024)}
   '';
 
+  # Fonts
+  fonts.packages = with pkgs; [
+    dejavu_fonts
+    fantasque-sans-mono
+    fira-code
+    fira-code-symbols
+    liberation_ttf
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-color-emoji
+  ];
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [

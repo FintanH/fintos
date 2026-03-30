@@ -115,7 +115,6 @@ in {
                     Slice = "session.slice";
                     ExecStart = "${getExe' cfg.node.package "radicle-node"} ${cfg.node.args}";
                     Environment = env cfg.node.environment;
-                    EnvironmentFile = "/home/fintohaps/radicle.env";
                     KillMode = "process";
                     Restart = "no";
                     RestartSec = "2";

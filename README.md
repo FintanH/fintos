@@ -1,6 +1,6 @@
 # NixOS Configuration
 
-Personal NixOS configuration managed with flakes.
+Personal NixOS configuration managed with flakes for a Framework 13 laptop.
 
 ## Quick Start
 
@@ -8,7 +8,7 @@ Personal NixOS configuration managed with flakes.
 # Build the system
 sudo nixos-rebuild switch --flake .#haptop
 
-# Or from anywhere
+# Or from anywhere (registered in nix registry)
 sudo nixos-rebuild switch --flake fintos
 ```
 
@@ -16,136 +16,110 @@ sudo nixos-rebuild switch --flake fintos
 
 ```
 .
-├── flake.nix                 # Flake definition and inputs
-├── configuration.nix         # System-level NixOS configuration
-├── home.nix                  # Home-manager user configuration
-├── hardware-configuration.nix
-├── microvm.nix               # MicroVM host configuration
+├── flake.nix                   # Flake inputs and NixOS system definition
+├── configuration.nix           # System-level NixOS configuration
+├── hardware-configuration.nix  # Generated hardware scan
+├── home.nix                    # Home-manager entry point (host)
 │
-├── lib/                      # Shared library functions and constants
-│   └── user.nix              # Centralized user constants (username, email, keys)
+├── lib/                        # Shared constants
+│   └── user.nix                # Centralized user identity (name, email, SSH keys)
 │
-├── modules/                  # Reusable NixOS and home-manager modules
-│   ├── nixos/                # System-level modules (tor, zsh)
-│   └── home-manager/         # User-level modules
-│       ├── programs/         # Program configurations (radicle)
-│       └── services/         # User services (radicle-node)
+├── agent/                      # AI agent configuration
+│   └── models.nix              # Ollama model definitions (shared across consumers)
 │
-├── home/                     # User environment configurations
-│   ├── emacs/                # Emacs configuration
-│   │   ├── default.nix       # Entry point with prelude
-│   │   ├── base.nix          # Core editor settings
-│   │   ├── ui.nix            # Theme and visual configuration
-│   │   ├── org.nix           # Org-mode configuration
-│   │   └── languages/        # Language-specific configurations
-│   ├── git.nix
-│   ├── zsh.nix
-│   ├── starship.nix
-│   └── ...
+├── modules/                    # Reusable option-defining modules
+│   ├── nixos/                  # NixOS modules (gnome, tor, zsh)
+│   │   └── default.nix         # Aggregator
+│   └── home-manager/           # Home-manager modules
+│       ├── programs/           # pi, openskills, radicle
+│       └── services/           # radicle-node systemd service
 │
-├── overlays/                 # Package overlays
-│   └── radicle-node.nix
+├── profiles/                   # Profiles that configure modules for this user
+│   ├── radicle.nix             # Radicle node restart on config change
+│   ├── radicle-service.nix     # Radicle service config (sops secrets, connect peers)
+│   └── rust.nix                # Rust toolchain (rustup, cargo config)
 │
-├── hardware/                 # Hardware-specific configurations
-│   ├── common/               # Shared hardware settings
-│   └── framework/            # Framework laptop specifics
+├── home/                       # Home-manager feature configurations
+│   ├── emacs/                  # Emacs (rycee emacs-init module)
+│   │   ├── default.nix         # Entry point, prelude, packages
+│   │   ├── base.nix            # Core packages (autorevert, saveplace)
+│   │   ├── ui.nix              # Theme (base16, beacon, nyan-mode)
+│   │   ├── org.nix             # Org-mode
+│   │   └── languages/          # Per-language support (rust, nix, haskell, web)
+│   ├── git.nix                 # Git + delta + difftastic
+│   ├── zsh.nix                 # Zsh + autosuggestions + direnv
+│   ├── starship.nix            # Starship prompt
+│   ├── opencode.nix            # Opencode AI agent
+│   ├── secrets.nix             # sops-nix home-manager secrets
+│   └── destiny.nix             # Custom package derivation
 │
-├── hm/                       # Legacy home-manager organization
-│   ├── module/               # Custom HM modules
-│   ├── profiles/             # User profiles
-│   └── services/             # User services
+├── overlays/                   # Nixpkgs overlays
+│   ├── radicle-node.nix        # Radicle 1.8.0 (ahead of nixpkgs)
+│   └── pi-packages.nix         # Pi extensions + RustDex CLI
 │
-├── microvm/                  # MicroVM infrastructure
-├── microvms/                 # MicroVM definitions
+├── hardware/                   # Hardware-specific configurations
+│   ├── common/                 # Shared CPU/GPU/storage settings
+│   └── framework/              # Framework laptop specifics
 │
-└── secrets/                  # SOPS-encrypted secrets
+├── microvm.nix                 # MicroVM declarations (pi, playground)
+├── microvm/                    # MicroVM infrastructure
+│   ├── base.nix                # Parameterized base for all VMs
+│   ├── home.nix                # Home-manager for VM guests
+│   └── network.nix             # Bridge + NAT for VM networking
+├── microvms/                   # Per-VM NixOS extensions
+│   ├── pi.nix                  # Pi coding agent VM
+│   └── playground.nix          # General-purpose VM
+│
+├── opencode/                   # Opencode agent/command definitions
+│   ├── agent/                  # Specialist agents (nix, rust, reviewer)
+│   └── command/                # Custom commands (review)
+│
+└── secrets/                    # SOPS-encrypted secrets
+    └── secrets.yaml
 ```
 
-## Key Components
+### Conventions
 
-### Flake Inputs
-
-- **nixpkgs**: NixOS 25.11
-- **home-manager**: User environment management
-- **microvm**: Lightweight VMs
-- **sops-nix**: Secrets management
-- **nur**: Nix User Repository
-
-### User Configuration
-
-User constants are centralized in `lib/user.nix`:
-
-```nix
-{
-  username = "fintohaps";
-  fullName = "Fintan Halpenny";
-  email = "fintan.halpenny@gmail.com";
-  # ...
-}
-```
+- **`modules/`** contains reusable option-defining modules (`mkOption`, `mkEnableOption`)
+- **`profiles/`** contains configurations that *set values* on those modules
+- **`home/`** contains home-manager feature configs (programs, shells, editors)
+- **`lib/user.nix`** is the single source of truth for user identity — imported wherever user constants are needed
+- **`agent/models.nix`** defines Ollama models as an attrset, consumed by `configuration.nix`, `opencode.nix`, and `emacs/default.nix`
 
 ## Secrets
 
-Secrets such as API keys and passwords are encrypted in an encrypted file,
-`secrets/secrets.yaml`.
+Secrets (API keys, passphrases) are managed with [sops-nix](https://github.com/Mic92/sops-nix) and encrypted in `secrets/secrets.yaml`.
 
-To update this file, run:
-
-```
+```bash
+# Edit secrets
 sops secrets/secrets.yaml
-```
 
-which will open editor for modifying the file.
-
-The `.sops.yaml` file contains `age` public keys for allowing decryption to
-occur. If these keys are updated, then run:
-
-```
+# After updating age keys in .sops.yaml
 sops updatekeys secrets/secrets.yaml
 ```
 
-### Emacs Configuration
+## MicroVMs
 
-The Emacs setup uses [rycee's emacs-init module](https://gitlab.com/rycee/nur-expressions) with configurations split by concern:
+[microvm-nix](https://microvm-nix.github.io/microvm.nix/intro.html) provides sandboxed VM environments, primarily for AI coding agents with filesystem access.
 
-- **base.nix**: Core packages (autorevert, saveplace, whitespace)
-- **ui.nix**: Visual theme (base16, beacon, nyan-mode, ace-window)
-- **languages/**: Per-language support (haskell, rust, nix, web, misc)
-
-## Development
-
-Format with alejandra:
-
-```bash
-nix fmt
-```
-
-## microvm
-
-[microvm-nix]: https://microvm-nix.github.io/microvm.nix/intro.html
-
-The [microvm-nix] project is used for created sandboxed VM environments.
-At the moment, these are used for playing around with AI agents,
-so that I can have some peace of mind when using something that has edit access to the filesystem.
+VMs share `/home/fintohaps/Developer` via virtiofs (read-write) and secrets via scoped virtiofs mounts. The host decrypts secrets with sops and exposes only per-VM scoped directories.
 
 ### Diagnostics
 
-Developing and improving this setup can be a finicky beast.
-I have often successfully switched a NixOS build, only to find that the VM would not start.
+```bash
+# VM service
+journalctl -xeu microvm@<vm-name>.service --no-pager
 
-In these scenarios, it's worth checking the following services to diagnose what went wrong.
+# Virtiofs
+journalctl -xeu microvm-virtiofsd@<vm-name>.service --no-pager
 
-The VM service itself:
-```
-journalctl -xeu microvm@{vm-name}.service --no-pager
-```
-
-The VM's virtual filesystem service:
-```
-journalctl -xeu microvm-vitiosfsd@{vm-name}.service --no-pager
+# TAP interfaces
+journalctl -xeu microvm-tap-interfaces@<vm-name>.service --no-pager
 ```
 
-The VM's TAP interfaces service:
-```
-journalctl -xeu microvm-tap-interfaces@{vm-name}.service
+## Development
+
+```bash
+# Format all .nix files
+nix fmt
 ```

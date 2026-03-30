@@ -1,11 +1,11 @@
-# hm/module/programs/pi.nix
+# modules/home-manager/programs/pi.nix
 #
 # Home-manager module that declaratively manages ~/.pi/agent/.
-# Import this in a home.nix or profile alongside other hm/module imports.
+# Import this in a home.nix or profile alongside other module imports.
 #
 # Minimal usage:
 #
-#   imports = [ ../hm/module/programs/pi.nix ];
+#   imports = [ ./modules/home-manager/programs/pi.nix ];
 #   programs.pi.enable = true;
 #
 # Pi packages can be managed two ways:
@@ -19,6 +19,17 @@
 #     "git:github.com/can1357/oh-my-pi"
 #   ];
 #
+# Agents (subagent definitions):
+#
+#   programs.pi.agents = {
+#     scout = {
+#       description = "Fast codebase recon";
+#       model = "claude-haiku-4-5";
+#       tools = [ "read" "bash" "grep" ];
+#       systemPrompt = "You are a scout...";
+#     };
+#   };
+#
 {
   config,
   lib,
@@ -26,6 +37,55 @@
   ...
 }: let
   cfg = config.programs.pi;
+
+  # Agent submodule type
+  agentType = lib.types.submodule {
+    options = {
+      description = lib.mkOption {
+        type = lib.types.str;
+        description = "Short description of the agent's purpose.";
+      };
+      model = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "claude-haiku-4-5";
+        description = ''
+          Model for this agent. When null, inherits the default model
+          from programs.pi.defaultModel.
+        '';
+      };
+      tools = lib.mkOption {
+        type = lib.types.nullOr (lib.types.listOf lib.types.str);
+        default = null;
+        example = ["read" "bash" "grep"];
+        description = ''
+          Tools available to this agent. null = all tools (default),
+          explicit list restricts to those tools only.
+        '';
+      };
+      systemPrompt = lib.mkOption {
+        type = lib.types.lines;
+        description = "System prompt (markdown body of the agent file).";
+      };
+    };
+  };
+
+  # Generate a pi agent markdown file from a name + agent attrset.
+  # Format: YAML frontmatter (---) followed by the system prompt body.
+  mkAgentFile = name: agent: let
+    frontmatter =
+      "name: ${name}\n"
+      + "description: ${agent.description}\n"
+      + (lib.optionalString (agent.model != null) "model: ${agent.model}\n")
+      + (lib.optionalString (agent.tools != null) "tools: ${lib.concatStringsSep ", " agent.tools}\n");
+  in
+    "---\n" + frontmatter + "---\n\n" + agent.systemPrompt + "\n";
+
+  # home.file entries for agents
+  agentFiles = lib.mapAttrs' (name: agent: {
+    name = ".pi/agent/agents/${name}.md";
+    value.text = mkAgentFile name agent;
+  }) cfg.agents;
 
   # Nix packages become local path references; source strings pass through.
   allPackages =
@@ -194,6 +254,34 @@ in {
       '';
     };
 
+    agents = lib.mkOption {
+      type = lib.types.attrsOf agentType;
+      default = {};
+      example = lib.literalExpression ''
+        {
+          scout = {
+            description = "Fast codebase recon";
+            model = "claude-haiku-4-5";
+            tools = [ "read" "bash" "grep" ];
+            systemPrompt = "You are a scout...";
+          };
+          implementer = {
+            description = "Implements code tasks autonomously";
+            systemPrompt = "You are an implementation agent...";
+          };
+        }
+      '';
+      description = ''
+        Named agent definitions for pi's subagent tool.
+        Each agent becomes a markdown file in ~/.pi/agent/agents/<name>.md
+        with YAML frontmatter (name, description, model, tools) and
+        the system prompt as the markdown body.
+
+        When model is null, the agent inherits programs.pi.defaultModel.
+        When tools is null, the agent has access to all tools.
+      '';
+    };
+
     package = lib.mkOption {
       type = lib.types.package;
       description = ''
@@ -208,7 +296,8 @@ in {
     home.packages = [cfg.package];
 
     home.file =
-      stableSkillLinks
+      agentFiles
+      // stableSkillLinks
       // devSkillLinks
       // {
         ".pi/agent/settings.json".text = builtins.toJSON settingsJson;

@@ -137,6 +137,29 @@
       };
 
       agentsMd = builtins.readFile ./pi/agent.md;
+
+      # Subagent definitions — each becomes ~/.pi/agent/agents/<name>.md
+      agents = {
+        scout = {
+          description = "Fast codebase recon — finds relevant code and returns structured context for handoff";
+          model = "claude-haiku-4-5";
+          tools = ["read" "grep" "find" "ls" "bash"];
+          systemPrompt = builtins.readFile ./pi/agents/scout.md;
+        };
+        implementer = {
+          description = "Implements code tasks autonomously with full tool access, following TDD and project conventions";
+          systemPrompt = builtins.readFile ./pi/agents/implementer.md;
+        };
+        reviewer = {
+          description = "Code review specialist — analyzes quality, correctness, security, and style";
+          tools = ["read" "grep" "find" "ls" "bash"];
+          systemPrompt = builtins.readFile ./pi/agents/reviewer.md;
+        };
+        nix-specialist = {
+          description = "NixOS and Nix configuration specialist — overlays, home-manager, microvm setup";
+          systemPrompt = builtins.readFile ./pi/agents/nix-specialist.md;
+        };
+      };
     };
 
     programs.tmux = {

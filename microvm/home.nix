@@ -14,7 +14,7 @@
     ../home/opencode.nix
     ../home/starship.nix
     ../home/zsh.nix
-    ../hm/profiles/rust.nix
+    ../profiles/rust.nix
   ];
 
   options.microvm = {

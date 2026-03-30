@@ -2,5 +2,7 @@
 { ... }: {
   imports = [
     ./radicle.nix
+    ./pi.nix
+    ./openskills.nix
   ];
 }

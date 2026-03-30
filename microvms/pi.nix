@@ -60,8 +60,8 @@
   # home-manager.sharedModules makes our modules available to all users.
   # home-manager.users.fintohaps is merged with the block in base.nix.
   home-manager.sharedModules = [
-    ../hm/module/programs/pi.nix
-    ../hm/module/programs/openskills.nix
+    ../modules/home-manager/programs/pi.nix
+    ../modules/home-manager/programs/openskills.nix
   ];
 
   home-manager.users.fintohaps = {

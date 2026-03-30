@@ -13,8 +13,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
 
-    ./modules/nixos/zsh.nix
-    ./modules/nixos/tor.nix
+    ./modules/nixos
     inputs.sops-nix.nixosModules.sops
   ];
 

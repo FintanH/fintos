@@ -16,9 +16,9 @@ in {
     ./home/secrets.nix
     ./home/starship.nix
     ./home/zsh.nix
-    ./hm/services/radicle.nix
-    ./hm/profiles/radicle.nix
-    ./hm/profiles/rust.nix
+    ./profiles/radicle-service.nix
+    ./profiles/radicle.nix
+    ./profiles/rust.nix
   ];
   home.username = "fintohaps";
   home.homeDirectory = "/home/fintohaps";

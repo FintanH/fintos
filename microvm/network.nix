@@ -9,7 +9,11 @@
   lib,
   pkgs,
   ...
-}: {
+}: let
+  # Physical network interface used for NAT (microvm internet access).
+  # Update this if your interface name changes (check with `ip link`).
+  externalInterface = "wlp192s0";
+in {
   # Enable IP forwarding (required for NAT)
   boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
 
@@ -43,6 +47,6 @@
   networking.nat = {
     enable = true;
     internalInterfaces = ["microbr"];
-    externalInterface = "wlp192s0";
+    inherit externalInterface;
   };
 }

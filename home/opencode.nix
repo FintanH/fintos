@@ -95,7 +95,7 @@ in {
     home.file = lib.mkMerge ((map mkSkill skills) ++ (map mkPlugin plugins));
     programs.opencode = {
       enable = true;
-      package = inputs.opencode.packages.${pkgs.system}.default;
+      package = inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
       settings.skills = {
         paths = trailofbitsSkills ++ superpowersSkills ++ cekSkills;

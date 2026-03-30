@@ -17,7 +17,8 @@
     ;
 
   microvmBase = import ./microvm/base.nix;
-  user = "fintohaps";
+  user-constants = import ./lib/user.nix;
+  user = user-constants.username;
 in {
   microvm.vms.playground = {
     autostart = false;
@@ -31,6 +32,7 @@ in {
           tapId = "microvm5";
           mac = "02:00:00:00:00:06";
           workspace = "/home/${user}/microvm/playground";
+          sshKey = user-constants.sshKeys.haptop;
           inherit user nixpkgs-unstable home-manager nurNoPkgs inputs;
         })
         ./microvms/playground.nix
@@ -51,6 +53,7 @@ in {
           tapId = "microvm6";
           mac = "02:00:00:00:00:07";
           workspace = "/home/${user}/microvm/pi";
+          sshKey = user-constants.sshKeys.haptop;
           inherit user nixpkgs-unstable home-manager nurNoPkgs inputs;
         })
         ./microvms/pi.nix

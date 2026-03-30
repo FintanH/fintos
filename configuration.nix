@@ -6,7 +6,9 @@
   pkgs,
   inputs,
   ...
-}: {
+}: let
+  user-constants = import ./lib/user.nix;
+in {
   imports = [
     # Include AMD configuration
     ./hardware/framework/13-inch/amd-ai-300-series/default.nix
@@ -100,7 +102,7 @@
   users.users.fintohaps = {
     linger = true;
     isNormalUser = true;
-    description = "Fintan Halpenny";
+    description = user-constants.fullName;
     extraGroups = ["networkmanager" "wheel"];
     packages = with pkgs; [
       firefox

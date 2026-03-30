@@ -4,9 +4,11 @@
   pkgs,
   ...
 }: let
+  user-constants = import ../lib/user.nix;
+
   user = {
-    name = "Fintan Halpenny";
-    email = "fintan.halpenny@gmail.com";
+    name = user-constants.fullName;
+    email = user-constants.email;
   };
 
   aliases = {
@@ -94,7 +96,7 @@ in {
     signing = {
       signByDefault = true;
       format = "ssh";
-      key = "key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEFsaRqAJ1r6bBFwlcWzJKN7DdjItQDumCNc0wqw6Dvk";
+      key = "key::${user-constants.sshKeys.primary}";
     };
   };
 }

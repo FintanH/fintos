@@ -15,6 +15,7 @@
   home-manager,
   nurNoPkgs,
   inputs,
+  sshKey,
   extraZshInit ? "",
 }: {
   config,
@@ -79,7 +80,7 @@ in {
     isNormalUser = true;
     uid = 1000;
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM4u7ma3yeNTSVvOmR30hq9G5ZzhUoTMPMTiwVx/MaPx fintohaps@haptop"
+      sshKey
     ];
   };
 
@@ -146,7 +147,7 @@ in {
 
   security.sudo.extraRules = [
     {
-      users = ["fintohaps"];
+      users = [user];
       commands = [
         {
           command = "ALL";

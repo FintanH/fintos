@@ -1,5 +1,5 @@
 final: prev: let
-  version = "1.8.0-rc.3";
+  version = "1.8.0";
   prevName = "radicle-node";
   finalName = "${prevName}-overlay";
 in {

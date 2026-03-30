@@ -3,16 +3,14 @@
   pkgs,
   ...
 }: {
-  services.xserver = {
+  services.xserver.enable = true;
+
+  services.displayManager.gdm = {
     enable = true;
-    displayManager.gdm = {
-      enable = true;
-      autoSuspend = false;
-    };
-    desktopManager.gnome = {
-      enable = true;
-    };
+    autoSuspend = false;
   };
+
+  services.desktopManager.gnome.enable = true;
 
   services.flatpak.enable = false;
 

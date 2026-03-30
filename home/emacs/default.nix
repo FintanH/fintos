@@ -5,7 +5,9 @@
   lib,
   nurNoPkgs,
   ...
-}: {
+}: let
+  models = import ../../agent/models.nix;
+in {
   imports = [
     nurNoPkgs.repos.rycee.hmModules.emacs-init
     ./base.nix
@@ -25,11 +27,6 @@
     recommendedGcSettings = true;
 
     prelude = ''
-      ;; This function is defined in Emacs 29 but magit requires it
-      (defun seq-keep (function sequence)
-        "Apply FUNCTION to SEQUENCE and return the list of all the non-nil results."
-          (delq nil (seq-map function sequence)))
-
       ;; Disable startup message.
       (setq inhibit-startup-message t
             inhibit-startup-echo-area-message (user-login-name))
@@ -586,12 +583,15 @@
 
       gptel = {
         enable = true;
-        config = ''
-          (setq gptel-model 'qwen2.5-coder:7b
+        config = let
+          defaultModel = models.qwen3-coder-30b.id;
+          allModels = builtins.concatStringsSep " " (map (m: m.id) (builtins.attrValues models));
+        in ''
+          (setq gptel-model '${defaultModel}
             gptel-backend (gptel-make-ollama "Ollama"
              :host "localhost:11434"
              :stream t
-             :models '(qwen2.5-coder:7b qwen2.5-coder:14 qwen2.5-coder:32b)))
+             :models '(${allModels})))
         '';
       };
     };

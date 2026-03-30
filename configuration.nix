@@ -258,7 +258,7 @@
   # Enable Ollama for AI agent models
   services.ollama = {
     enable = true;
-    loadModels = map (m: m.id) (import ./agent/models.nix);
+    loadModels = map (m: m.id) (builtins.attrValues (import ./agent/models.nix));
   };
 
   # Query Ollama on localhost:11434

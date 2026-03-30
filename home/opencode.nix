@@ -76,7 +76,7 @@
         output = m.output;
       };
     };
-  }) (import ../agent/models.nix));
+  }) (builtins.attrValues (import ../agent/models.nix)));
 in {
   options.opencode = {
     anthropicKeyFile = lib.mkOption {

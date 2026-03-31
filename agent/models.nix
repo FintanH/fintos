@@ -1,4 +1,3 @@
-# models.nix
 # Shared Ollama model definitions — single source of truth.
 #
 # Each model is an attrset with: id, name, context, output.

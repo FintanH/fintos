@@ -1,5 +1,3 @@
-# modules/home-manager/programs/pi.nix
-#
 # Home-manager module that declaratively manages ~/.pi/agent/.
 # Import this in a home.nix or profile alongside other module imports.
 #
@@ -82,10 +80,12 @@
     "---\n" + frontmatter + "---\n\n" + agent.systemPrompt + "\n";
 
   # home.file entries for agents
-  agentFiles = lib.mapAttrs' (name: agent: {
-    name = ".pi/agent/agents/${name}.md";
-    value.text = mkAgentFile name agent;
-  }) cfg.agents;
+  agentFiles =
+    lib.mapAttrs' (name: agent: {
+      name = ".pi/agent/agents/${name}.md";
+      value.text = mkAgentFile name agent;
+    })
+    cfg.agents;
 
   # Nix packages become local path references; source strings pass through.
   allPackages =

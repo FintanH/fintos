@@ -54,6 +54,9 @@
 
     # RustDex CLI binary (code indexer for pi-rustdex extension)
     rustdex
+
+    # GitNexus CLI (knowledge graph builder for pi-gitnexus extension)
+    gitnexus
   ];
 
   # Inject the pi and openskills home-manager modules.

@@ -28,6 +28,63 @@ final: prev: {
     '';
   };
 
+  # GitNexus CLI — required by the pi-gitnexus extension.
+  # The extension provides Pi tool wrappers and auto-augmentation; the CLI
+  # builds and queries the knowledge graph and must be on PATH.
+  gitnexus = final.buildNpmPackage rec {
+    pname = "gitnexus";
+    version = "1.4.10";
+
+    src = final.fetchFromGitHub {
+      owner = "abhigyanpatwari";
+      repo = "GitNexus";
+      rev = "v${version}";
+      hash = "sha256-m1fSWX80cWUy5F6q3pBcML+EzoYOVSarR5S1T4ZlR6E=";
+    };
+
+    sourceRoot = "${src.name}/gitnexus";
+    npmDepsHash = "sha256-v4vizPcaqQ0VkUQ2yHV6tOwxsTGREf5ibXPmAoOrbr4=";
+    forceGitDeps = true;
+    makeCacheWritable = true;
+
+    # Prevent ALL npm lifecycle scripts globally.
+    # tree-sitter-cli (transitive dep via tree-sitter-dart) tries to download
+    # a binary from GitHub, which fails in the Nix sandbox.
+    npmFlags = ["--ignore-scripts"];
+
+    nativeBuildInputs = with final; [
+      python3
+      pkg-config
+      autoPatchelfHook
+    ];
+
+    buildInputs = [final.stdenv.cc.cc.lib];
+
+    # sharp ships musl binaries that can't be patched on glibc systems.
+    # They're optional platform-specific deps — ignore them.
+    autoPatchelfIgnoreMissingDeps = ["libc.musl-*"];
+
+    postPatch = ''
+      # Remove the prepare script (runs "npm run build" + husky, fails without .git)
+      ${final.jq}/bin/jq 'del(.scripts.prepare)' package.json > package.json.tmp
+      mv package.json.tmp package.json
+    '';
+
+    npmBuildScript = "build";
+
+    # node-gyp-build for tree-sitter packages just finds prebuilds/ —
+    # no network needed. Run rebuild to trigger it.
+    preBuild = ''
+      npm rebuild --ignore-scripts=false 2>&1 || true
+    '';
+
+    meta = {
+      description = "Graph-powered code intelligence for AI agents";
+      homepage = "https://github.com/abhigyanpatwari/GitNexus";
+      mainProgram = "gitnexus";
+    };
+  };
+
   piPackages = let
     mkSimplePiPackage = {
       pname,

@@ -152,12 +152,12 @@
         };
         reviewer = {
           description = "Code review specialist — analyzes quality, correctness, security, and style";
-          tools = ["read" "grep" "find" "ls" "bash"];
+          tools = ["read" "grep" "find" "ls" "bash" "rustdex"];
           systemPrompt = builtins.readFile ./pi/agents/reviewer.md;
         };
-        nix-specialist = {
+        nixos-specialist = {
           description = "NixOS and Nix configuration specialist — overlays, home-manager, microvm setup";
-          systemPrompt = builtins.readFile ./pi/agents/nix-specialist.md;
+          systemPrompt = builtins.readFile ./pi/agents/nixos-specialist.md;
         };
       };
     };

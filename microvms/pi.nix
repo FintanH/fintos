@@ -22,7 +22,10 @@
   # Overlay: make pkgs.llm-agents.pi available inside the guest.
   # The host's overlay (applied in flake.nix) is not inherited by the guest's
   # separate NixOS evaluation.
-  nixpkgs.overlays = [inputs.llm-agents.overlays.default];
+  nixpkgs.overlays = [
+    inputs.llm-agents.overlays.default
+    (import ../overlays/radicle-node.nix)
+  ];
 
   # Secrets: share pi-scoped secrets via virtiofs.
   #
@@ -41,7 +44,26 @@
       source = "/run/vm-secrets/pi";
       mountPoint = "/run/secrets";
     }
+    # Host's Radicle repository data — only storage and cobs are shared,
+    # never the host's keys or config.  Mounted read-only so the VM can
+    # inspect repos via `rad` CLI without any write access.
+    {
+      proto = "virtiofs";
+      tag = "rad-storage";
+      source = "/home/fintohaps/.radicle/storage";
+      mountPoint = "/var/lib/radicle/storage";
+    }
+    {
+      proto = "virtiofs";
+      tag = "rad-cobs";
+      source = "/home/fintohaps/.radicle/cobs";
+      mountPoint = "/var/lib/radicle/cobs";
+    }
   ];
+
+  # Enforce read-only at the mount level.
+  fileSystems."/var/lib/radicle/storage".options = lib.mkAfter ["ro"];
+  fileSystems."/var/lib/radicle/cobs".options = lib.mkAfter ["ro"];
 
   # Extra system packages
   environment.systemPackages = with pkgs; [
@@ -57,6 +79,9 @@
 
     # GitNexus CLI (knowledge graph builder for pi-gitnexus extension)
     gitnexus
+
+    # Radicle CLI (version-matched with host via overlay)
+    radicle-node-overlay
   ];
 
   # Inject the pi and openskills home-manager modules.
@@ -65,9 +90,15 @@
   home-manager.sharedModules = [
     ../modules/home-manager/programs/pi.nix
     ../modules/home-manager/programs/openskills.nix
+    # programs.radicle is provided by upstream home-manager (nixos-25.11)
   ];
 
   home-manager.users.fintohaps = {
+    config,
+    lib,
+    pkgs,
+    ...
+  }: {
     # OpenSkills - remote skill installation
     programs.openskills = {
       enable = true;
@@ -161,6 +192,41 @@
         nixos-specialist = {
           description = "NixOS and Nix configuration specialist — overlays, home-manager, microvm setup";
           systemPrompt = builtins.readFile ./pi/agents/nixos-specialist.md;
+        };
+      };
+    };
+
+    # Radicle — read-only CLI access to host's repository data.
+    #
+    # The VM has its own identity (keys) and config.  Storage and cobs are
+    # mounted directly via virtiofs (read-only) — the host's keys never
+    # enter the VM.  No radicle-node service runs here.
+
+    # Declarative symlinks: virtiofs mounts → RAD_HOME so `rad` finds them.
+    # Read-only is enforced at the mount level (fileSystems options above).
+    home.file.".radicle/storage".source = config.lib.file.mkOutOfStoreSymlink "/var/lib/radicle/storage";
+    home.file.".radicle/cobs".source = config.lib.file.mkOutOfStoreSymlink "/var/lib/radicle/cobs";
+
+    # Generate Ed25519 keypair for the VM's Radicle identity (one-time)
+    home.activation.setupRadicle = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      mkdir -p "$HOME/.radicle/node"
+      if [ ! -f "$HOME/.radicle/keys/radicle" ]; then
+        mkdir -p "$HOME/.radicle/keys"
+        ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f "$HOME/.radicle/keys/radicle" -N "" -C "radicle"
+      fi
+    '';
+
+    programs.radicle = {
+      enable = true;
+      cli.package = pkgs.radicle-node-overlay;
+      uri.rad.browser.enable = false;
+      uri.web-rad.enable = false;
+      settings = {
+        preferredSeeds = [];
+        node = {
+          alias = "pi-vm";
+          # No listen addresses — we never run the node
+          listen = [];
         };
       };
     };

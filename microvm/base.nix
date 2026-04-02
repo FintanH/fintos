@@ -48,7 +48,7 @@ in {
 
   # ── Claude Code CLI (from nixpkgs-unstable, unfree) ───────────
   environment.systemPackages = [
-    pkgsUnstable.claude-code
+    pkgs.claude-code
   ];
 
   networking.hostName = hostName;

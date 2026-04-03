@@ -254,6 +254,28 @@ in {
       '';
     };
 
+    customProviders = lib.mkOption {
+      type = lib.types.nullOr lib.types.attrs;
+      default = null;
+      example = lib.literalExpression ''
+        {
+          providers.ollama = {
+            baseUrl = "http://localhost:11434/v1";
+            api = "openai-completions";
+            apiKey = "ollama";
+            models = [
+              { id = "llama3.1:8b"; }
+            ];
+          };
+        }
+      '';
+      description = ''
+        Custom provider definitions written to ~/.pi/agent/models.json.
+        Used for Ollama, vLLM, LM Studio, or any OpenAI-compatible
+        provider.  See pi docs/models.md for the full schema.
+      '';
+    };
+
     agents = lib.mkOption {
       type = lib.types.attrsOf agentType;
       default = {};
@@ -301,6 +323,9 @@ in {
       // devSkillLinks
       // {
         ".pi/agent/settings.json".text = builtins.toJSON settingsJson;
+      }
+      // lib.optionalAttrs (cfg.customProviders != null) {
+        ".pi/agent/models.json".text = builtins.toJSON cfg.customProviders;
       }
       // lib.optionalAttrs (cfg.agentsMd != "") {
         ".pi/agent/AGENTS.md".text = cfg.agentsMd;

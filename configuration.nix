@@ -271,8 +271,14 @@ in {
   # Enable Ollama for AI agent models
   services.ollama = {
     enable = true;
+    # Listen on all interfaces so microvms can reach the API.
+    # Access is scoped via the firewall rule below (microbr only).
+    host = "0.0.0.0";
     loadModels = map (m: m.id) (builtins.attrValues (import ./agent/models.nix));
   };
+
+  # Allow microvms on the bridge to reach the Ollama API.
+  networking.firewall.interfaces."microbr".allowedTCPPorts = [11434];
 
   # Query Ollama on localhost:11434
   services.open-webui.enable = true;

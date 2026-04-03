@@ -18,7 +18,30 @@
   lib,
   inputs,
   ...
-}: {
+}: let
+  agentModels = import ../agent/models.nix;
+
+  # Host bridge IP — the gateway address assigned in microvm/network.nix.
+  hostIp = "192.168.83.1";
+
+  # Transform agent/models.nix entries into pi models.json model objects.
+  piOllamaModels = map (m:
+    {
+      id = m.id;
+      name = m.name;
+      contextWindow = m.context;
+      maxTokens = m.output;
+      reasoning = m.reasoning or false;
+      input = ["text"];
+      cost = {
+        input = 0;
+        output = 0;
+        cacheRead = 0;
+        cacheWrite = 0;
+      };
+    }
+    // lib.optionalAttrs (m ? compat) {inherit (m) compat;}) (builtins.attrValues agentModels);
+in {
   # Overlay: make pkgs.llm-agents.pi available inside the guest.
   # The host's overlay (applied in flake.nix) is not inherited by the guest's
   # separate NixOS evaluation.
@@ -161,8 +184,27 @@
         "git:github.com/jayshah5696/pi-agent-extensions" # Interactive code review
       ];
 
+      # Ollama provider — models served by the host, reached via the bridge.
+      customProviders = {
+        providers.ollama = {
+          baseUrl = "http://${hostIp}:11434/v1";
+          api = "openai-completions";
+          apiKey = "ollama";
+          compat = {
+            supportsDeveloperRole = false;
+            supportsReasoningEffort = false;
+          };
+          models = piOllamaModels;
+        };
+      };
+
       extraSettings = {
         thinking = "medium";
+        # Ctrl+P cycles through Claude and local Ollama models.
+        enabledModels = [
+          "claude-*"
+          "ollama/*"
+        ];
         # Include openskills directories for skill discovery
         skills = [
           "~/.claude/skills" # openskills global

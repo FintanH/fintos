@@ -18,6 +18,12 @@ let
     thinkingFormat = "qwen-chat-template";
   };
 
+  # Shared compat flags for local Gemma 4 models served by Ollama.
+  gemmaCompat = {
+    supportsDeveloperRole = false;
+    supportsReasoningEffort = false;
+  };
+
   models = {
     qwen3-coder-30b = {
       id = "qwen3-coder:30b";
@@ -34,6 +40,22 @@ let
       output = 32768;
       reasoning = true;
       compat = qwenCompat;
+    };
+    gemma4-e4b = {
+      id = "gemma4:e4b";
+      name = "Gemma 4 E4B";
+      context = 131072; # 128K native
+      output = 32768;
+      reasoning = true;
+      compat = gemmaCompat;
+    };
+    gemma4-26b = {
+      id = "gemma4:26b";
+      name = "Gemma 4 26B MoE";
+      context = 131072; # 128K; cap below native 256K for local RAM comfort
+      output = 32768;
+      reasoning = true;
+      compat = gemmaCompat;
     };
   };
 in

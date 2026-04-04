@@ -94,7 +94,7 @@ in {
     pkgs.llm-agents.openskills # cross-agent skill synchronization
 
     # required for pi package installation
-    nodejs
+    nodejs_24
     git
 
     # RustDex CLI binary (code indexer for pi-rustdex extension)
@@ -179,8 +179,7 @@ in {
       # Pi-managed sources (packages with runtime deps or complex git repos)
       packageSources = [
         "npm:@zenobius/pi-worktrees" # Git worktree management
-        "npm:pi-fetch" # URL fetching
-        "git:github.com/can1357/oh-my-pi" # Atomic git commits, LSP
+        "git:https://github.com/kotarac/pi-fetch" # URL fetching
         "git:github.com/jayshah5696/pi-agent-extensions" # Interactive code review
       ];
 

@@ -40,6 +40,10 @@ in {
   # time.timeZone = "Europe/Dublin";
   # Allow the time zone to be updated automatically.
   services.automatic-timezoned.enable = true;
+  # GeoClue2 can time out on boot before automatic-timezoned connects to it.
+  # Restart on failure so the service recovers without manual intervention.
+  systemd.services.automatic-timezoned.serviceConfig.Restart = "on-failure";
+  systemd.services.automatic-timezoned.serviceConfig.RestartSec = "10s";
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_IE.UTF-8";

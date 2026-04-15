@@ -94,6 +94,7 @@ in {
     just
     mergiraf
     niv
+    radicle-desktop
     sequoia-sqop # stateless GPG key generating
 
     # Nix caching

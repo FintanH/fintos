@@ -90,7 +90,6 @@
             }
             {
               nixpkgs.overlays = [
-                (import ./overlays/ollama.nix)
                 (import ./overlays/radicle-node.nix)
                 (import ./overlays/pi-packages.nix)
                 inputs.opencode.overlays.default

@@ -23,6 +23,16 @@ in {
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  #########################################################################
+  # Used for simulation testing in `heartwood`
+  #########################################################################
+  # Kernel modules for QEMU/talosctl networking
+  boot.kernelModules = ["kvm-amd" "tun" "bridge" "veth"]; # or kvm-intel
+  # /dev/kvm access
+  virtualisation.libvirtd.enable = true; # or just ensure kvm group access
+  networking.firewall.trustedInterfaces = ["talos+"];
+  #########################################################################
+
   # Enable `fwupdmgr`: `refresh` to retrieve updates and `update` to apply them.
   services.fwupd.enable = true;
 

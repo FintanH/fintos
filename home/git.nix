@@ -29,6 +29,10 @@ in {
       # emacs files
       "*~undo-tree~"
       "**/.\\#*"
+
+      # pi files
+      # Note that these may need to be re-enabled for local projects
+      ".pi"
     ];
     settings = {
       inherit user;

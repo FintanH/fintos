@@ -208,6 +208,7 @@ in {
       direnv = {
         enable = true;
         command = ["direnv-mode" "direnv-update-environment"];
+        hook = ["(after-init . direnv-mode)"];
       };
 
       drag-stuff = {

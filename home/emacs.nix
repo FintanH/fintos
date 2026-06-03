@@ -1063,7 +1063,6 @@
                 '("${pkgs.rust-analyzer}/bin/rust-analyzer"))
           (setq rustic-cargo-bin
                  "${pkgs.cargo}/bin/cargo")
-          (setq rustic-format-on-save t)
         '';
       };
 

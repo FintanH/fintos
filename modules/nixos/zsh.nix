@@ -4,7 +4,6 @@
   ...
 }: {
   environment.systemPackages = with pkgs; [
-    fzf-zsh
     oh-my-zsh
     ripgrep
     zsh

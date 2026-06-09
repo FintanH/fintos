@@ -49,7 +49,6 @@ sudo nixos-rebuild switch --flake fintos
 │   ├── git.nix                 # Git + delta + difftastic
 │   ├── zsh.nix                 # Zsh + autosuggestions + direnv
 │   ├── starship.nix            # Starship prompt
-│   ├── opencode.nix            # Opencode AI agent
 │   ├── secrets.nix             # sops-nix home-manager secrets
 │   └── destiny.nix             # Custom package derivation
 │
@@ -70,10 +69,6 @@ sudo nixos-rebuild switch --flake fintos
 │   ├── pi.nix                  # Pi coding agent VM
 │   └── playground.nix          # General-purpose VM
 │
-├── opencode/                   # Opencode agent/command definitions
-│   ├── agent/                  # Specialist agents (nix, rust, reviewer)
-│   └── command/                # Custom commands (review)
-│
 └── secrets/                    # SOPS-encrypted secrets
     └── secrets.yaml
 ```
@@ -84,7 +79,7 @@ sudo nixos-rebuild switch --flake fintos
 - **`profiles/`** contains configurations that *set values* on those modules
 - **`home/`** contains home-manager feature configs (programs, shells, editors)
 - **`lib/user.nix`** is the single source of truth for user identity — imported wherever user constants are needed
-- **`agent/models.nix`** defines Ollama models as an attrset, consumed by `configuration.nix`, `opencode.nix`, and `emacs/default.nix`
+- **`agent/models.nix`** defines Ollama models as an attrset, consumed by `configuration.nix`, and `emacs/default.nix`
 
 ## Secrets
 

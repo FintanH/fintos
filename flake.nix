@@ -25,7 +25,6 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    opencode.url = "github:dan-online/opencode-nix";
     llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
@@ -92,7 +91,6 @@
               nixpkgs.overlays = [
                 (import ./overlays/radicle-node.nix)
                 (import ./overlays/pi-packages.nix)
-                inputs.opencode.overlays.default
               ];
             }
             microvm.nixosModules.host

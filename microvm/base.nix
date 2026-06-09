@@ -1,6 +1,6 @@
 # Parameterized module that every coding-agent VM imports.
 # Provides: networking, shared dirs, qemu config,
-#           home-manager with Zsh + Claude Code + opencode.
+#           home-manager with Zsh + Claude Code + Pi.
 #
 # Called as a function from microvm.nix — see there for usage.
 {

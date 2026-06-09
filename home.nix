@@ -12,7 +12,6 @@ in {
   imports = [
     ./home/emacs
     ./home/git.nix
-    ./home/opencode.nix
     ./home/secrets.nix
     ./home/starship.nix
     ./home/zsh.nix

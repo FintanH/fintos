@@ -8,8 +8,7 @@
 #   builtins.attrValues models
 #
 # Pi-specific fields (reasoning, compat) are used by microvms/pi.nix
-# to generate ~/.pi/agent/models.json.  Other consumers (opencode,
-# configuration.nix) ignore them harmlessly.
+# to generate ~/.pi/agent/models.json.  Other consumers (configuration.nix) ignore them harmlessly.
 let
   # Shared compat flags for local Qwen models served by Ollama.
   qwenCompat = {

@@ -12,6 +12,7 @@ in {
   imports = [
     ./home/emacs
     ./home/git.nix
+    ./home/jj.nix
     ./home/secrets.nix
     ./home/starship.nix
     ./home/zsh.nix
@@ -87,7 +88,6 @@ in {
     delta # git-delta
     difftastic
     direnv
-    jujutsu # jj
     jjui
     lazyjj
     just

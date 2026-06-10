@@ -229,6 +229,7 @@ in {
 
   # Set emacs default editor
   environment.variables.EDITOR = "emacs";
+  environment.variables.VISUAL = "emacs";
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

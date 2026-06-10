@@ -1,5 +1,5 @@
 # Nix language support
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.emacs.init.usePackage = {
     nix-mode = {
       enable = true;

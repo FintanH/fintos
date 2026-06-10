@@ -1,5 +1,5 @@
 # Haskell language support
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.emacs.init.usePackage = {
     haskell-mode = {
       enable = true;

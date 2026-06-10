@@ -1,5 +1,5 @@
 # Aggregates all language-specific configurations
-{ ... }: {
+{...}: {
   imports = [
     ./haskell.nix
     ./rust.nix

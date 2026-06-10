@@ -1,5 +1,5 @@
 # Miscellaneous language support
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.emacs.init.usePackage = {
     adoc-mode = {
       enable = true;

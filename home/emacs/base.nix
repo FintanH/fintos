@@ -1,5 +1,5 @@
 # Core editor packages - utilities, file handling, editing fundamentals
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.emacs.init.usePackage = {
     abbrev = {
       enable = true;

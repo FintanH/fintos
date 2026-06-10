@@ -1,5 +1,5 @@
 # Visual and window management configuration
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.emacs.init.usePackage = {
     base16-theme = {
       enable = true;

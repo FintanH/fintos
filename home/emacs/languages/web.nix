@@ -1,5 +1,5 @@
 # Web development support (HTML, CSS, JS, Markdown, XML)
-{ pkgs, ... }: {
+{pkgs, ...}: {
   programs.emacs.init.usePackage = {
     js = {
       enable = true;

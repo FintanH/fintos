@@ -23,11 +23,6 @@ in {
   home.username = "fintohaps";
   home.homeDirectory = "/home/fintohaps";
 
-  services.emacs = {
-    enable = true;
-    defaultEditor = true;
-  };
-
   # Enable automatic time zone and location
   dconf.settings = {
     "org/gnome/desktop/datetime" = {automatic-timezone = true;};

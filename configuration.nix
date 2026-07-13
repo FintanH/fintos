@@ -112,6 +112,15 @@ in {
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
+  # Run emacs service making the default EDITOR the custom emacs package with all
+  # the bells and whistles
+  services.emacs = {
+    enable = true;
+    defaultEditor = true;
+    package = config.home-manager.users.fintohaps.programs.emacs.finalPackage;
+  };
+  environment.variables.VISUAL = "emacsclient -c -a ''";
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.fintohaps = {
     linger = true;
@@ -226,10 +235,6 @@ in {
     pciutils
     usbutils
   ];
-
-  # Set emacs default editor
-  environment.variables.EDITOR = "emacs";
-  environment.variables.VISUAL = "emacs";
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

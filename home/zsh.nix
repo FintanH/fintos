@@ -17,9 +17,6 @@
       autoload -U colors && colors;
       eval "$(direnv hook zsh)";
     '';
-    sessionVariables = {
-      EDITOR = "${pkgs.emacs}/bin/emacs";
-    };
     shellAliases = {
       ll = "ls -l";
 

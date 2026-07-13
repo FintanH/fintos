@@ -46,7 +46,7 @@ in {
   # The host's overlay (applied in flake.nix) is not inherited by the guest's
   # separate NixOS evaluation.
   nixpkgs.overlays = [
-    inputs.llm-agents.overlays.default
+    inputs.llm-agents.overlays.shared-nixpkgs
     (import ../overlays/radicle-node.nix)
   ];
 

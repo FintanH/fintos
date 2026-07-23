@@ -1,5 +1,5 @@
 final: prev: let
-  version = "1.9.1";
+  version = "1.10.0-rc.2";
   prevName = "radicle-node";
   finalName = "${prevName}-overlay";
 in {
@@ -10,7 +10,7 @@ in {
     src = final.fetchgit {
       inherit (prevAttrs.src) url;
       tag = "releases/${version}";
-      hash = "sha256-8wLVNHF9qkKBK2s6RdH0/2To2zamx8RON5iBjkQoQY4=";
+      hash = "sha256-8cFYsR5fGiChBduBmNcYp0MLVqlY2KnfieFa+yzbL7E=";
       leaveDotGit = true;
       postFetch = ''
         git -C $out rev-parse HEAD > $out/.git_head
@@ -21,7 +21,7 @@ in {
 
     cargoDeps = final.rustPlatform.fetchCargoVendor {
       inherit (finalAttrs) src;
-      hash = "sha256-holYrCL0FApbnFRj0+bVnjkiNL14jclaM8xIqRHfEkc=";
+      hash = "sha256-E5CDlHcdFFwRw3S+wLcRLpLzrGVn43z4FznJrYemYP4=";
     };
 
     doCheck = false;

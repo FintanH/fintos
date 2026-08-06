@@ -7,7 +7,9 @@
   user,
   inputs,
   ...
-}: {
+}: let
+  user-constants = import ../lib/user.nix;
+in {
   imports = [
     ../home/emacs
     ../home/git.nix
@@ -41,7 +43,6 @@
       fd
       git
       htop
-      jujutsu
       jjui
       just
       jq
@@ -49,6 +50,17 @@
       ripgrep
       tree
     ];
+
+    # Slim jj identity so commits don't use the empty identity.
+    # Editing happens on the host; the VM only runs pi, so no editor/diff
+    # tooling is configured here — just name and email from lib/user.nix.
+    programs.jujutsu = {
+      enable = true;
+      settings.user = {
+        name = user-constants.fullName;
+        email = user-constants.email;
+      };
+    };
 
     home.stateVersion = "25.11";
     programs.home-manager.enable = true;

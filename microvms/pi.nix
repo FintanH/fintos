@@ -169,6 +169,7 @@ in {
         "radicle-dev/git-internals"
         "radicle-dev/radicle-cobs"
         "Rust/rust-skills-rules"
+        "personal/rust-study"
       ];
 
       # Pi packages as Nix derivations (peer-deps-only, fully declarative)

@@ -5,6 +5,20 @@
 - ~/Developer/AgentSkills is editable on the host; changes are live here
 - Skills available in ~/.pi/agent/skills/
 
+## Version Control
+- Version control is jujutsu (`jj`), colocated with git. A detached git
+  HEAD is the normal, expected state — never ask about it, never offer to
+  "fix" it, and do not create a branch just to escape it.
+- Use `jj` for all version-control operations; do not use `git` for
+  committing, branching, or staging. There is no staging step — `jj` always
+  tracks the working copy.
+- Record a discrete change with `jj commit -m "..."` (describes the current
+  working copy and starts a fresh one). To amend the current change's
+  message instead, use `jj describe -m "..."`.
+- Skills that begin by running `git status`/`git log` to check branch state:
+  skip that check here — the jj working copy is always "detached" in git
+  terms and that is fine.
+
 ## Development Practices
 - Test-Driven Development (TDD) - write tests first
 - Pure core, imperative shell architecture

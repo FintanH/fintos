@@ -136,6 +136,9 @@ in {
 
         # Additional security (MITRE ATT&CK mapped)
         {source = "mukul975/Anthropic-Cybersecurity-Skills";}
+
+        # General engineering skills (grilling, tdd, diagnosing-bugs, specs)
+        "mattpocock/skills"
       ];
     };
 

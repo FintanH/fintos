@@ -32,6 +32,19 @@
 - Sub-agents: spawn `pi` instances in separate tmux windows/panes
 - Use `/plan` for structured planning (requires pi-plan-mode package)
 
+## Skill Selection (overlapping skills)
+Prefer mattpocock skills for general engineering; use rust-* skills for
+Rust-specific work.
+- TDD: Rust → rust-tdd; general → tdd
+- Debugging → diagnosing-bugs
+- Design/requirements dialogue → grill-with-docs (code), grill-me (non-code)
+- Code review → code-review
+- Planning & specs → to-spec, to-tickets, wayfinder
+- Handoff → handoff
+- Rust specifics → rust-tdd, rust-functional, rust-types
+mattpocock and superpowers skills never share a name, so all remain
+available via /skill:<name> regardless of preference.
+
 ## Available Skills
 Load with `/skill:<name>`:
 - rust-tdd: Test-driven development workflow

@@ -102,6 +102,7 @@ in {
 
     # application
     destiny
+    discord
     element-desktop
     keet
     obsidian

@@ -117,6 +117,7 @@ in {
             $DRY_RUN_CMD openskills install ${lib.escapeShellArg src} \
               ${lib.optionalString cfg.globalInstall "--global"} \
               ${lib.optionalString cfg.universalFormat "--universal"} \
+              --yes \
               || echo "Warning: Failed to install ${src}" >&2
           '')
           cfg.remoteSkills}
@@ -127,7 +128,7 @@ in {
       lib.mkIf cfg.autoSync
       (lib.hm.dag.entryAfter ["writeBoundary" "openskillsInstall"] ''
         export PATH="${cfg.package}/bin:$PATH"
-        $DRY_RUN_CMD openskills sync || true
+        $DRY_RUN_CMD openskills sync --yes || true
       '');
   };
 }

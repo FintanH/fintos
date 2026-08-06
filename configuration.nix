@@ -244,6 +244,8 @@ in {
     enableSSHSupport = true;
   };
 
+  programs.nix-ld.enable = true;
+
   virtualisation = {
     # Enable common container config files in /etc/containers
     containers.enable = true;

@@ -51,6 +51,14 @@ in {
     pkgs.claude-code
   ];
 
+  programs.nix-ld.enable = true;
+
+  # Optional: extra libraries for FHS binaries that need more than libc,
+  # e.g. libstdc++ for some prebuilt npm binaries
+  programs.nix-ld.libraries = with pkgs; [
+    stdenv.cc.cc.lib
+  ];
+
   networking.hostName = hostName;
   system.stateVersion = "25.11";
   nix.settings.experimental-features = ["nix-command" "flakes"];

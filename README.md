@@ -93,6 +93,61 @@ sops secrets/secrets.yaml
 sops updatekeys secrets/secrets.yaml
 ```
 
+### Adding a new secret
+
+Adding a secret is three edits plus a rebuild. Steps 2–3 apply only when the
+secret must reach a microvm (e.g. the pi VM); host-only secrets stop after
+step 1 and declaring the secret.
+
+```bash
+# 1. Add the value under a new top-level key in the encrypted file
+sops secrets/secrets.yaml            # e.g.  my_api_key: sk-...
+```
+
+2. **Declare it** in `configuration.nix` under `sops.secrets`:
+
+   ```nix
+   secrets = {
+     # ...existing...
+     my_api_key = {};
+   };
+   ```
+
+3. **Expose it to a VM** (skip for host-only secrets). The host runs sops and
+   templates scoped copies into `/run/vm-secrets/<vm>/`, which is shared into
+   the guest at `/run/secrets/`. Add a template in `configuration.nix`
+   alongside the existing `pi-*` ones:
+
+   ```nix
+   templates."pi-my-key" = {
+     content = config.sops.placeholder.my_api_key;
+     path = "/run/vm-secrets/pi/my_api_key";
+     group = "kvm";
+     mode = "0440";
+   };
+   ```
+
+   Then consume it in the guest. For an API key that pi should export as an
+   env var, add it to `programs.pi.apiKeyFiles` in `microvms/pi.nix`:
+
+   ```nix
+   apiKeyFiles.MY_API_KEY = "/run/secrets/my_api_key";
+   ```
+
+4. **Apply** on the host (rebuilds and restarts affected VMs):
+
+   ```bash
+   sudo nixos-rebuild switch --flake fintos
+   ```
+
+Example: the pi VM's `openrouter_api_key` follows exactly this path — declared
+in `sops.secrets`, templated to `/run/vm-secrets/pi/openrouter_api_key`, and
+exported as `$OPENROUTER_API_KEY` via `apiKeyFiles`. Verify a VM secret landed:
+
+```bash
+ssh fintohaps@192.168.83.8 'zsh -lic "echo -n \$OPENROUTER_API_KEY | head -c 6"'
+```
+
 ## MicroVMs
 
 [microvm-nix](https://microvm-nix.github.io/microvm.nix/intro.html) provides sandboxed VM environments, primarily for AI coding agents with filesystem access.

@@ -156,6 +156,23 @@ in {
       '';
     };
 
+    apiKeyFiles = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = {};
+      example = lib.literalExpression ''
+        {
+          OPENROUTER_API_KEY = "/run/secrets/openrouter_api_key";
+        }
+      '';
+      description = ''
+        Map of environment-variable name to a file path containing that
+        provider's API key. Each entry is exported at shell login (if the
+        file is readable), in addition to `apiKeyFile` (which exports
+        ANTHROPIC_API_KEY). Reference these vars from models.json/custom
+        providers as "$VAR_NAME".
+      '';
+    };
+
     stableSkillDirs = lib.mkOption {
       type = lib.types.listOf lib.types.path;
       default = [];
@@ -340,12 +357,22 @@ in {
 
     home.sessionPath = lib.mkIf hasNpmSources ["$HOME/.npm-global/bin"];
 
-    # Export API key from the secret file into the shell.
-    # pi reads ANTHROPIC_API_KEY natively; we never put the key in settings.json.
-    programs.zsh.initContent = lib.mkIf (cfg.apiKeyFile != null) ''
-      if [ -r "${cfg.apiKeyFile}" ]; then
-        export ANTHROPIC_API_KEY="$(cat ${cfg.apiKeyFile})"
-      fi
-    '';
+    # Export provider API keys from their secret files into the shell.
+    # pi reads $ANTHROPIC_API_KEY / $OPENROUTER_API_KEY etc. natively;
+    # we never put a key in settings.json or models.json.
+    programs.zsh.initContent = let
+      allApiKeyFiles =
+        (lib.optionalAttrs (cfg.apiKeyFile != null) {
+          ANTHROPIC_API_KEY = cfg.apiKeyFile;
+        })
+        // cfg.apiKeyFiles;
+      exportLine = var: path: ''
+        if [ -r "${path}" ]; then
+          export ${var}="$(cat ${path})"
+        fi
+      '';
+    in
+      lib.mkIf (allApiKeyFiles != {})
+      (lib.concatStringsSep "\n" (lib.mapAttrsToList exportLine allApiKeyFiles));
   };
 }

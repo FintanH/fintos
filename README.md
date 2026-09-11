@@ -118,3 +118,11 @@ journalctl -xeu microvm-tap-interfaces@<vm-name>.service --no-pager
 # Format all .nix files
 nix fmt
 ```
+
+## Merging PDFs
+
+I always end up needing to merge two PDFs, so here is the command:
+
+```
+pdftk [<a>.pdf <b>.pdf ...] cat output <final>.pdf
+```

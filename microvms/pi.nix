@@ -8,7 +8,7 @@
 #
 # This file adds:
 #   - pi-coding-agent via hm/module/programs/pi.nix
-#   - openskills for cross-agent skill synchronization
+#   - curated AgentSkills discovery (no openskills)
 #   - virtiofs share of /run/vm-secrets/pi (scoped secrets, avoids sops inside VM)
 #   - tmux (needed for pi sub-agent pattern)
 #
@@ -105,7 +105,6 @@ in {
   # Extra system packages
   environment.systemPackages = with pkgs; [
     tmux # pi's recommended mechanism for background/sub-agent processes
-    pkgs.llm-agents.openskills # cross-agent skill synchronization
 
     # required for pi package installation
     nodejs_24
@@ -121,12 +120,11 @@ in {
     radicle-node-overlay
   ];
 
-  # Inject the pi and openskills home-manager modules.
+  # Inject the pi home-manager module.
   # home-manager.sharedModules makes our modules available to all users.
   # home-manager.users.fintohaps is merged with the block in base.nix.
   home-manager.sharedModules = [
     ../modules/home-manager/programs/pi.nix
-    ../modules/home-manager/programs/openskills.nix
     # programs.radicle is provided by upstream home-manager (nixos-25.11)
   ];
 
@@ -136,27 +134,7 @@ in {
     pkgs,
     ...
   }: {
-    # OpenSkills - remote skill installation
-    programs.openskills = {
-      enable = true;
-      package = pkgs.llm-agents.openskills;
-
-      remoteSkills = [
-        # Security & Crypto (critical for Radicle P2P)
-        "trailofbits/skills"
-
-        # Rust development methodology
-        "obra/superpowers"
-
-        # Additional security (MITRE ATT&CK mapped)
-        {source = "mukul975/Anthropic-Cybersecurity-Skills";}
-
-        # General engineering skills (grilling, tdd, diagnosing-bugs, specs)
-        "mattpocock/skills"
-      ];
-    };
-
-    # Pi - coding agent with local + openskills paths
+    # Pi - coding agent with curated AgentSkills discovery
     programs.pi = {
       enable = true;
       package = pkgs.llm-agents.pi;
@@ -180,6 +158,9 @@ in {
       # path, so ~/Developer/AgentSkills is already accessible in the VM.
       devSkillsMount = "/home/fintohaps/Developer/AgentSkills";
       devSkillNames = [
+        "obra/superpowers/skills"
+        "mattpocock/skills"
+        "trailofbits-curated"
         "radicle-dev/rust-tdd"
         "radicle-dev/rust-functional"
         "radicle-dev/rust-types"
@@ -241,11 +222,6 @@ in {
         enabledModels =
           ["claude-*" "ollama/*"]
           ++ map (m: "openrouter/${m.id}") (builtins.attrValues openrouterModels);
-        # Include openskills directories for skill discovery
-        skills = [
-          "~/.claude/skills" # openskills global
-          "~/.agent/skills" # openskills universal
-        ];
       };
 
       agentsMd = builtins.readFile ./pi/agent.md;

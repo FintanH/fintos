@@ -20,6 +20,7 @@
   ...
 }: let
   agentModels = import ../agent/models.nix;
+  openrouterModels = import ../agent/openrouter-models.nix;
 
   # Host bridge IP — the gateway address assigned in microvm/network.nix.
   hostIp = "192.168.83.1";
@@ -41,6 +42,19 @@
       };
     }
     // lib.optionalAttrs (m ? compat) {inherit (m) compat;}) (builtins.attrValues agentModels);
+
+  # Transform agent/openrouter-models.nix entries into pi models.json objects.
+  piOpenrouterModels = map (m:
+    {
+      id = m.id;
+      name = m.name;
+      contextWindow = m.context;
+      maxTokens = m.output;
+      reasoning = m.reasoning or false;
+      input = m.input or ["text"];
+      inherit (m) cost;
+    }
+    // lib.optionalAttrs (m ? compat) {inherit (m) compat;}) (builtins.attrValues openrouterModels);
 in {
   # Overlay: make pkgs.llm-agents.pi available inside the guest.
   # The host's overlay (applied in flake.nix) is not inherited by the guest's
@@ -147,10 +161,15 @@ in {
       enable = true;
       package = pkgs.llm-agents.pi;
       provider = "anthropic";
-      defaultModel = "claude-sonnet-4-5";
+      defaultModel = "openrouter/anthropic/claude-opus-5";
 
       # Secrets arrive via the virtiofs share above (/run/vm-secrets/pi -> /run/secrets)
       apiKeyFile = "/run/secrets/anthropic_api_key";
+
+      # OpenRouter key arrives via the same virtiofs secrets share.
+      apiKeyFiles = {
+        OPENROUTER_API_KEY = "/run/secrets/openrouter_api_key";
+      };
 
       # Stable skills: Nix store paths, rebuilt on nixos-rebuild.
       stableSkillDirs = [
@@ -199,15 +218,29 @@ in {
           };
           models = piOllamaModels;
         };
+        # OpenRouter — single gateway to OpenAI, Anthropic, and open-weight
+        # models. Read the key directly from the secrets file at request time
+        # (shell-independent; file published by system.activationScripts.piVmSecrets
+        # on the host). apiKeyFiles below also exports it for zsh sessions.
+        providers.openrouter = {
+          baseUrl = "https://openrouter.ai/api/v1";
+          api = "openai-completions";
+          apiKey = "!cat /run/secrets/openrouter_api_key";
+          authHeader = true;
+          models = piOpenrouterModels;
+        };
       };
 
       extraSettings = {
         thinking = "medium";
-        # Ctrl+P cycles through Claude and local Ollama models.
-        enabledModels = [
-          "claude-*"
-          "ollama/*"
-        ];
+        # Ctrl+P / /model cycling. pi ships a built-in `openrouter` provider
+        # with the full catalog, so we curate: only our tiered set is enabled.
+        # enabledModels globs do NOT cross "/", so "openrouter/*" would match
+        # only single-segment ids (auto/free/fusion) — we list full ids instead,
+        # derived from the catalog so there is one source of truth.
+        enabledModels =
+          ["claude-*" "ollama/*"]
+          ++ map (m: "openrouter/${m.id}") (builtins.attrValues openrouterModels);
         # Include openskills directories for skill discovery
         skills = [
           "~/.claude/skills" # openskills global

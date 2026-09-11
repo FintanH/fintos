@@ -154,6 +154,7 @@ in {
     secrets = {
       anthropic_api_key = {};
       gemini_api_key = {};
+      openrouter_api_key = {};
       rad_passphrase = {};
     };
 
@@ -163,24 +164,51 @@ in {
         content = ''
           ANTHROPIC_API_KEY=${config.sops.placeholder.anthropic_api_key}
           GEMINI_API_KEY=${config.sops.placeholder.gemini_api_key}
+          OPENROUTER_API_KEY=${config.sops.placeholder.openrouter_api_key}
         '';
-        path = "/run/vm-secrets/pi/agent.env";
         group = "kvm";
         mode = "0440";
       };
       "pi-anthropic-key" = {
         content = config.sops.placeholder.anthropic_api_key;
-        path = "/run/vm-secrets/pi/anthropic_api_key";
+        group = "kvm";
+        mode = "0440";
+      };
+      "pi-openrouter-key" = {
+        content = config.sops.placeholder.openrouter_api_key;
         group = "kvm";
         mode = "0440";
       };
       "pi-gemini-key" = {
         content = config.sops.placeholder.gemini_api_key;
-        path = "/run/vm-secrets/pi/gemini_api_key";
         group = "kvm";
         mode = "0440";
       };
     };
+  };
+
+  # Publish the pi VM's sops-rendered secrets into the virtiofs-shared
+  # directory as REAL files. sops renders each template to
+  # /run/secrets/rendered/<name> and points the shared path at it via an
+  # ABSOLUTE symlink, which dangles inside the guest (whose /run/secrets is
+  # the shared dir, not the host's). Copying the resolved bytes makes them
+  # readable in the VM. Runs after sops' setupSecrets activation script.
+  system.activationScripts.piVmSecrets = {
+    deps = ["setupSecrets"];
+    text = ''
+      install -d -m 0750 -o root -g kvm /run/vm-secrets/pi
+      for pair in pi-env:agent.env pi-anthropic-key:anthropic_api_key \
+                  pi-gemini-key:gemini_api_key pi-openrouter-key:openrouter_api_key; do
+        src=/run/secrets/rendered/''${pair%%:*}
+        dst=/run/vm-secrets/pi/''${pair##*:}
+        if [ ! -e "$src" ]; then
+          echo "piVmSecrets: expected rendered secret missing: $src" >&2
+          exit 1
+        fi
+        rm -f "$dst"
+        install -m 0440 -o root -g kvm "$src" "$dst"
+      done
+    '';
   };
 
   # Enable automatic login for the user.
